@@ -1,0 +1,38 @@
+---
+title: "Practical Work"
+subtitle: "Lifetime Data Analysis"
+author: "Rodrigo Arriaza, Alexander J Ohrt"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment = "#>", eval = TRUE)
+```
+
+# Introduction
+
+We are given a data set on sexually transmitted diseases (STDs). This is data from a study about gonorrhea and chlamydia in 877 women. The objective with this practical work is to study possible risk factors for a reinfection with gonorrhea or chlamydia in women who have suffered one of both infections previously. The variables of interest are sociodemographic variables or those related to sexual practice. We have a lot of variables at our disposal, as can be seen from the data set below. We have chosen to use the following variables: ....
+
+This coice is based on our statistical/medical criteria ...
+
+```{r, echo = F}
+std_data <- read.table("STD_onlydata.txt")
+colnames(std_data) <- c("ObsNum", "Ethnicity", "MaritalStatus", "Age", "YearsSchool", "InitInfect", "NumPartners", "OralSex12m", 
+                        "OralSex30d", "RectalSex12m", "RectalSex30d", "AbPain", "SignDischarge", "SignDysuria", "CondomUse", 
+                        "SignItch", "SignLesion", "SignRash", "SignLymph", "InvVagAtExam", "DischargeExam", "AbnormNodeExam", 
+                        "Reinfection", "TimeUntilReinf")
+str(std_data)
+```
+
+# Descriptive Analysis
+
+
+
+# Nonparametric Analysis
+
+# Fit of a parametric survival model
+
+# Fit of a semi-parametric survival model
+
+# Conclusions
