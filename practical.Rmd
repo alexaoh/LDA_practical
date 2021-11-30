@@ -16,6 +16,7 @@ library(corrplot)
 library(GGally)
 library(survival)
 library(FHtest) 
+library(GofCens)
 ```
 
 # Introduction
@@ -51,7 +52,7 @@ colnames(std_data) <- variable.names <- c("ObsNum", "Ethnicity", "MaritalStatus"
 std_data[, variable.names[-c(1, 4, 5, 7, 24)]] <- lapply(std_data[, variable.names[-c(1, 4, 5, 7, 24)]], factor)
 std_data$cens <- rep(1, length = dim(std_data)[[1]]) # All uncensored, thus cens = 1 for all rows. 
 
-variables.chosen <- c("Age", "NumPartners", "CondomUse", "Ethnicity")
+variables.chosen <- c("Age", "NumPartners", "CondomUse", "Ethnicity") # ETC!
 continuous.variables <- unlist(lapply(std_data, is.numeric))
 continuous.variables <- continuous.variables[-length(continuous.variables)] # Removing the cens-value. 
 ```
@@ -100,7 +101,6 @@ plot(s1fit, col = 2, xlab = "Time to reinfection [days]",
      lty = 1, lwd = 3, yaxs = "i", xaxs = "i", bty = "n",
      conf.int = F)
 title("Survival Function")
-# Very smooth function! Should limit the time a bit perhaps and introduce some censoring?
 ```
 
 ```{r}
@@ -177,6 +177,100 @@ FHtestrcc(s1.NumPartners)
 
 # Fit of a parametric survival model
 
+Fit a Weibull, log-logistic or lognormal model. Justify the theoretical choice we are taking!!
+
+```{r}
+# I am testing all three below, since I am not sure which will be better.
+
+# Below we have the null models. 
+s2 <- with(std_data, Surv(TimeUntilReinf, cens))
+loglo <- survreg(s2 ~ 1, dist = "loglo")  
+summary(loglo)
+weibull <- survreg(s2 ~ 1)
+summary(weibull)
+lognormal <- survreg(s2 ~ 1, dist = "lognormal")
+summary(lognormal)
+
+# Below we add some covariates to the models. INCLUDE ALL OF THEM PERHAPS! (OR TEST WITH DIFFERENT ONES!)
+# First we add Ethnicity  e.g.
+loglo.Ethnicity <- survreg(s2 ~ Ethnicity, dist = "loglo", data = std_data)  
+summary(loglo.Ethnicity)
+weibull.Ethnicity <- survreg(s2 ~ Ethnicity, data = std_data)
+summary(weibull.Ethnicity)
+lognormal.Ethnicity <- survreg(s2 ~ Ethnicity, dist = "lognormal", data = std_data)
+summary(lognormal.Ethnicity)
+
+
+loglo.full <- survreg(s2 ~ Ethnicity + Age + NumPartners + CondomUse + YearsSchool + SignDischarge, data = std_data, dist = "loglo")
+summary(loglo.full)
+
+loglo.pred <- predict(loglo.full, type = "linear")
+resids.loglo <- (log(std_data$TimeUntilReinf) - loglo.pred) / loglo.full$scale
+
+weibull.full <- update(loglo.full, dist = "weibull")
+summary(weibull.full)
+
+weibull.pred <- predict(weibull.full, type = "linear")
+resids.weibull <- (log(std_data$TimeUntilReinf) - weibull.pred) / weibull.full$scale
+
+lognormal.full <- update(loglo.full, dist = "lognormal")
+summary(lognormal.full)
+
+lognormal.pred <- predict(lognormal.full, type = "linear")
+resids.logno <- (log(std_data$TimeUntilReinf) - lognormal.pred) / lognormal.full$scale
+
+# Model checking (using residuals etc, as done in lab 6).
+# Log-logistic
+par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
+plot(survfit(Surv(resids.loglo, std_data$cens) ~ 1), col = c(1,2,2), xlab = "Residuals",
+     ylab = expression(bolditalic(hat(S)(t))),
+     lty = 1, lwd = 3, yaxs = "i", xaxs = "i", bty = "n")
+title("Residuals of the log-logistic Regression Model")
+curve(plogis(x, lower.tail = F), from = min(resids.loglo), to = max(resids.loglo), col = 3, lwd = 3,
+      add = TRUE)
+legend("bottomleft", c("KM estimate", "95% - CI", "Stand. Logistic Distribution"),
+       col = c(1, 2, 3), lty = c(1, 2, 1), lwd = 3, bty = "n")
+
+# Weibull
+par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
+plot(survfit(Surv(resids.weibull, std_data$cens) ~ 1), col = c(1,2,2), xlab = "Residuals",
+     ylab = expression(bolditalic(hat(S)(t))),
+     lty = 1, lwd = 3, yaxs = "i", xaxs = "i", bty = "n")
+title("Residuals of the Weibull Regression Model")
+survgumb <- function(x) {
+  return(exp(-exp(x)))
+}
+curve(survgumb, from = min(resids.weibull), to = max(resids.weibull), col = 3, lwd = 3,
+      add = TRUE)
+legend("bottomleft", c("KM estimate", "95% - CI", "Stand. Gumbel Distribution"),
+       col = c(1, 2, 3), lty = c(1, 2, 1), lwd = 3, bty = "n")
+
+# Log-normal
+par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
+plot(survfit(Surv(resids.logno, std_data$cens) ~ 1), col = c(1,2,2), xlab = "Residuals",
+     ylab = expression(bolditalic(hat(S)(t))),
+     lty = 1, lwd = 3, yaxs = "i", xaxs = "i", bty = "n")
+title("Residuals of the Lognormal Regression Model")
+curve(pnorm(x, lower.tail = F), from = min(resids.logno), to = max(resids.logno), col = 3, lwd = 3,
+      add = TRUE)
+legend("bottomleft", c("KM estimate", "95% - CI", "Stand. Normal Distribution"),
+       col = c(1, 2, 3), lty = c(1, 2, 1), lwd = 3, bty = "n")
+```
+
+I would say that the Weibull looks the best based on the three residual plots that can be seen above. **But perhaps they should be tested in some other ways as well??**
+
+Goodness of fit of the parametric models is done in lab6! These things can be used to choose which of the three distributions should be used!!
+
+```{r}
+# Does not really fit into the estimations from above! What have I done wrong?! I think I am misunderstanding something.
+cumhazPlot(std_data$TimeUntilReinf, std_data$cens,col = 4, distr = c("wei", "loglo", "lognormal"), font.lab = 4)
+```
+
+Effect size measures: 
+
+* lognormal: acceleration factor.
+* weibull: HR.
+* log-logistic: OR.
 
 # Fit of a semi-parametric survival model
 
