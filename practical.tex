@@ -4,21 +4,10 @@
 %
 \documentclass[
 ]{article}
-\title{Practical Work}
-\usepackage{etoolbox}
-\makeatletter
-\providecommand{\subtitle}[1]{% add subtitle to \maketitle
-  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
-}
-\makeatother
-\subtitle{Lifetime Data Analysis}
-\author{Rodrigo Arriaza, Alexander J Ohrt}
-\date{06 December, 2021}
-
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
-\usepackage{iftex}
-\ifPDFTeX
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
@@ -134,9 +123,20 @@
 \usepackage[normalem]{ulem}
 \usepackage{makecell}
 \usepackage{xcolor}
-\ifLuaTeX
+\ifluatex
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
+
+\title{Practical Work}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{Lifetime Data Analysis}
+\author{Rodrigo Arriaza, Alexander J Ohrt}
+\date{07 desember, 2021}
 
 \begin{document}
 \maketitle
@@ -149,6 +149,8 @@ We are given a data set on sexually transmitted diseases (STDs). This is data fr
 \begin{itemize}
 \tightlist
 \item
+  Age: The age of the woman.
+\item
   NumPartners: The number of partners during the last 30 days.
 \item
   CondomUse: Use of condoms (1: always, 2: once in a while, 3: never)
@@ -157,18 +159,16 @@ We are given a data set on sexually transmitted diseases (STDs). This is data fr
 \item
   InitInfect: Initial infection (1: Gonorrhea, 2: Chlamydia, 3: both)
 \item
-  NumPartners: Number of sexual partners during the last 30 days.
-\item
   InvVagAtExam: Involvement vagina at exam (1: yes; 0: no).
 \item
   DischargeExam: Discharge at exam (1: yes; 0: no)
 \end{itemize}
 
-The first two were chosen based on results from a \href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1744639/}{study} on gonorrhea reinfection in heterosexual STD clinic attendees. The study concluded that increased reinfection risk (of gonorrhea) was associated with younger age and a greater number of recent sex partners, among other risk factors. Moreover, the authors concluded that any type of condom use was a risk factor for reinfection with gonorrhea in women. However by using statistical analysis we found that the Age of the woman and the ethnicity (a variable that was included in the forementioned study) are not statistically significant.
+The first two were chosen based on results from a \href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1744639/}{study} on gonorrhea reinfection in heterosexual STD clinic attendees. The study concluded that increased reinfection risk (of gonorrhea) was associated with younger age and a greater number of recent sex partners, among other risk factors. Moreover, the authors concluded that any type of condom use was a risk factor for reinfection with gonorrhea in women. However by using statistical analysis we found that the Age of the woman and the ethnicity (a variable that was not included in the aforementioned study) are not statistically significant (Necessary to mention Ethnicity here, if it is not a part of the study?). Q: Should perhaps describe what we have done and why it has been done? I am going to ask Klaus about what he thinks about it also I think, just to see what he says.
 
-Another \href{https://policylab.chop.edu/sites/default/files/pdf/publications/Preventing_Chlamydia_Gonorrhea_Reinfection_through_Increased_Use_of_EPT.pdf}{publication} reports that, on average, 14\% of women with clamydia and 12\% of women with gonorrhea get reinfected, with younger women at higher risk. Moreover, they state that many adolescents treated for infection of one of the two STDs are reinfected within three to six months, usually because of resumed sexual contact with an untreated partner. Thus, the marital status might be interesting to analyse. However, this is not added after all, because, as seen in the exploratory data analysis below, the ages are low, which should mean that the amount in each level of \texttt{MaritalStatus} is very skewed towards single. This can be seen in the table below as well.
+Another \href{https://policylab.chop.edu/sites/default/files/pdf/publications/Preventing_Chlamydia_Gonorrhea_Reinfection_through_Increased_Use_of_EPT.pdf}{publication} reports that, on average, 14\% of women with clamydia and 12\% of women with gonorrhea get reinfected, with younger women at higher risk. Moreover, they state that many adolescents treated for infection of one of the two STDs are reinfected within three to six months, usually because of resumed sexual contact with an untreated partner. Thus, the marital status might be interesting to analyse. However, this is not added, because, as seen in the exploratory data analysis below, the ages are low, which should mean that the amount in each level of \texttt{MaritalStatus} is very skewed towards single. This can be seen in the table below as well. NOT SURE IF WE SHOULD KEEP THIS, DEPENDS ON THE AMOUNT OF ROOM I GUESS. can leave it until the end.
 
-\href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2094865/}{This meta-analysis} reports that the relationship between race, socioeconomic status (SES) and chlamydial infection is not clear. It concludes that SES was not associated with chlamydia infection, where they tested for several variables, where level of parent's education was one of them. Either way, we think it might be interesting to see if the years of schooling of the women have any impact on chlamyida reinfection and as is shown below it showed to be statistically significant during the exploratory analysis.
+\href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2094865/}{This meta-analysis} reports that the relationship between race, socioeconomic status (SES) and chlamydial infection is not clear. It concludes that SES was not associated with chlamydia infection, where they tested for several variables, where level of parent's education was one of them. Either way, we think it might be interesting to see if the years of schooling of the women have any impact on chlamydia reinfection and as is shown below it showed to be statistically significant during the exploratory analysis. Q: I also think that this would be a reason to look at race also (combined with the first study, where they only had afro-americans. Perhaps we can try to mix the variables chosen based on studies and on the statistical method? (that is; if this statistical method is something we can trust))
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -192,6 +192,8 @@ Naturally, the categorical variable which states if the woman is reinfected or n
 \hypertarget{variable-selection}{%
 \subsection{Variable selection}\label{variable-selection}}
 
+Q: What is the offset(log(TimeUntilReInf))?
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{std\_data}\SpecialCharTok{$}\NormalTok{Ethnicity }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(std\_data}\SpecialCharTok{$}\NormalTok{Ethnicity)}
@@ -202,7 +204,7 @@ Naturally, the categorical variable which states if the woman is reinfected or n
              \AttributeTok{data=}\NormalTok{std\_data)}
 \NormalTok{s }\OtherTok{\textless{}{-}} \FunctionTok{summary}\NormalTok{(nb.model)}
 \NormalTok{k }\OtherTok{\textless{}{-}}\NormalTok{ knitr}\SpecialCharTok{::}\FunctionTok{kable}\NormalTok{(s}\SpecialCharTok{$}\NormalTok{coefficients, }\AttributeTok{caption =} \StringTok{\textquotesingle{}Variables statistical significance\textquotesingle{}}\NormalTok{)}
-\NormalTok{kableExtra}\SpecialCharTok{::}\FunctionTok{row\_spec}\NormalTok{(k, }\FunctionTok{c}\NormalTok{(}\DecValTok{6}\SpecialCharTok{:}\DecValTok{9}\NormalTok{,}\DecValTok{14}\NormalTok{,}\DecValTok{16}\NormalTok{,}\DecValTok{23}\NormalTok{,}\DecValTok{24}\NormalTok{), }\AttributeTok{color=}\StringTok{\textquotesingle{}white\textquotesingle{}}\NormalTok{, }\AttributeTok{background =} \StringTok{\textquotesingle{}cyan\textquotesingle{}}\NormalTok{)}
+\NormalTok{kableExtra}\SpecialCharTok{::}\FunctionTok{row\_spec}\NormalTok{(k, }\FunctionTok{c}\NormalTok{(}\DecValTok{6}\SpecialCharTok{:}\DecValTok{9}\NormalTok{,}\DecValTok{14}\NormalTok{,}\DecValTok{18}\NormalTok{,}\DecValTok{23}\NormalTok{,}\DecValTok{24}\NormalTok{), }\AttributeTok{color=}\StringTok{\textquotesingle{}white\textquotesingle{}}\NormalTok{, }\AttributeTok{background =} \StringTok{\textquotesingle{}cyan\textquotesingle{}}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -244,11 +246,11 @@ RectalSex30d1 & -0.1627456 & 0.6172379 & -0.2636675 & 0.7920361\\
 \hline
 SignDischarge1 & 0.1330009 & 0.1306664 & 1.0178660 & 0.3087416\\
 \hline
-\cellcolor{cyan}{\textcolor{white}{SignDysuria1}} & \cellcolor{cyan}{\textcolor{white}{0.1954606}} & \cellcolor{cyan}{\textcolor{white}{0.1812469}} & \cellcolor{cyan}{\textcolor{white}{1.0784219}} & \cellcolor{cyan}{\textcolor{white}{0.2808455}}\\
+SignDysuria1 & 0.1954606 & 0.1812469 & 1.0784219 & 0.2808455\\
 \hline
 CondomUse2 & -0.1553543 & 0.2725108 & -0.5700849 & 0.5686201\\
 \hline
-CondomUse3 & -0.4582270 & 0.2819913 & -1.6249684 & 0.1041693\\
+\cellcolor{cyan}{\textcolor{white}{CondomUse3}} & \cellcolor{cyan}{\textcolor{white}{-0.4582270}} & \cellcolor{cyan}{\textcolor{white}{0.2819913}} & \cellcolor{cyan}{\textcolor{white}{-1.6249684}} & \cellcolor{cyan}{\textcolor{white}{0.1041693}}\\
 \hline
 SignItch1 & -0.2209724 & 0.1750560 & -1.2622958 & 0.2068424\\
 \hline
@@ -370,8 +372,8 @@ The median survival time is 247 days, as can be seen below.
 \begin{verbatim}
 #> Call: survfit(formula = s1)
 #> 
-#>       n  events  median 0.95LCL 0.95UCL 
-#>     877     877     247     216     277
+#>        n events median 0.95LCL 0.95UCL
+#> [1,] 877    877    247     216     277
 \end{verbatim}
 
 Comparison of survival functions by means of nonparametric tests, such as the logrank test. The curve on ethnicity could be interesting to test (the survivals cross though!)
