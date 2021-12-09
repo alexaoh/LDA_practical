@@ -181,15 +181,14 @@ InitInfect is interesting to use, because several of the studies above are only 
         \StringTok{"SignDischarge"}\NormalTok{,}\StringTok{"SignDysuria"}\NormalTok{,}\StringTok{"CondomUse"}\NormalTok{,}\StringTok{"SignItch"}\NormalTok{,}\StringTok{"SignLesion"}\NormalTok{,}
         \StringTok{"SignRash"}\NormalTok{,}\StringTok{"SignLymph"}\NormalTok{,}\StringTok{"InvVagAtExam"}\NormalTok{,}\StringTok{"DischargeExam"}\NormalTok{,}\StringTok{"AbnormNodeExam"}\NormalTok{, }
         \StringTok{"Reinfection"}\NormalTok{, }\StringTok{"TimeUntilReinf"}\NormalTok{)}
-\NormalTok{non\_factor\_indices }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{7}\NormalTok{,}\DecValTok{23}\NormalTok{, }\DecValTok{24}\NormalTok{) }\CommentTok{\# I THINK Reinfection should be a factor as well!}
-\CommentTok{\# This would mean that we should remove 23 from this list. }
+\NormalTok{non\_factor\_indices }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{7}\NormalTok{,}\DecValTok{23}\NormalTok{, }\DecValTok{24}\NormalTok{) }
 \NormalTok{std\_data[, variable.names[}\SpecialCharTok{{-}}\NormalTok{non\_factor\_indices]] }\OtherTok{\textless{}{-}} \FunctionTok{lapply}\NormalTok{(}
 \NormalTok{  std\_data[, variable.names[}\SpecialCharTok{{-}}\NormalTok{non\_factor\_indices]],factor)}
-\NormalTok{std\_data}\SpecialCharTok{$}\NormalTok{cens }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\AttributeTok{length =} \FunctionTok{dim}\NormalTok{(std\_data)[[}\DecValTok{1}\NormalTok{]]) }\CommentTok{\# All uncensored, thus cens = 1 for all rows. }
 
-\NormalTok{variables.chosen }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Age"}\NormalTok{, }\StringTok{"NumPartners"}\NormalTok{, }\StringTok{"CondomUse"}\NormalTok{, }\StringTok{"Ethnicity"}\NormalTok{) }\CommentTok{\# ETC!}
-\NormalTok{continuous.variables }\OtherTok{\textless{}{-}} \FunctionTok{unlist}\NormalTok{(}\FunctionTok{lapply}\NormalTok{(std\_data, is.numeric))}
-\NormalTok{continuous.variables }\OtherTok{\textless{}{-}}\NormalTok{ continuous.variables[}\SpecialCharTok{{-}}\FunctionTok{length}\NormalTok{(continuous.variables)] }\CommentTok{\# Removing the cens{-}value. }
+\NormalTok{covariates.chosen }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Age"}\NormalTok{, }\StringTok{"NumPartners"}\NormalTok{, }\StringTok{"CondomUse"}\NormalTok{, }
+                      \StringTok{"YearsSchool"}\NormalTok{, }\StringTok{"InitInfect"}\NormalTok{, }\StringTok{"InvVagAtExam"}\NormalTok{, }\StringTok{"DischargeExam"}\NormalTok{) }\CommentTok{\# ETC!}
+\NormalTok{continuous.covar }\OtherTok{\textless{}{-}} \FunctionTok{unlist}\NormalTok{(}\FunctionTok{lapply}\NormalTok{(std\_data, is.numeric)) }
+\NormalTok{continuous.covar[}\StringTok{"Reinfection"}\NormalTok{] }\OtherTok{\textless{}{-}} \ConstantTok{FALSE} \CommentTok{\# Remove Reinfection also. }
 \end{Highlighting}
 \end{Shaded}
 
@@ -214,8 +213,81 @@ Q: What is the offset(log(TimeUntilReInf))? I don't understand this to be honest
 \end{Highlighting}
 \end{Shaded}
 
+\begin{table}
+
+\caption{\label{tab:variable-select}Variables Statistical Significance}
+\centering
+\begin{tabular}[t]{l|r|r|r|r}
+\hline
+  & Estimate & Std. Error & z value & Pr(>|z|)\\
+\hline
+(Intercept) & -4.4766626 & 0.6791361 & -6.5917022 & 0.0000000\\
+\hline
+EthnicityW & -0.0786114 & 0.1576156 & -0.4987540 & 0.6179527\\
+\hline
+MaritalStatusM & 0.1142920 & 0.4681139 & 0.2441542 & 0.8071114\\
+\hline
+MaritalStatusS & 0.5011754 & 0.3203698 & 1.5643657 & 0.1177317\\
+\hline
+Age & 0.0188481 & 0.0156143 & 1.2071011 & 0.2273932\\
+\hline
+\cellcolor{blue}{\textcolor{white}{YearsSchool}} & \cellcolor{blue}{\textcolor{white}{-0.1689015}} & \cellcolor{blue}{\textcolor{white}{0.0442657}} & \cellcolor{blue}{\textcolor{white}{-3.8156308}} & \cellcolor{blue}{\textcolor{white}{0.0001358}}\\
+\hline
+InitInfect2 & -0.3302518 & 0.1740868 & -1.8970524 & 0.0578210\\
+\hline
+InitInfect3 & -0.3318821 & 0.1755787 & -1.8902183 & 0.0587288\\
+\hline
+NumPartners & 0.1164568 & 0.0598373 & 1.9462257 & 0.0516276\\
+\hline
+OralSex12m1 & -0.3703474 & 0.2387666 & -1.5510855 & 0.1208812\\
+\hline
+OralSex30d1 & -0.3246975 & 0.2643311 & -1.2283739 & 0.2193066\\
+\hline
+RectalSex12m1 & 0.0669703 & 0.4881503 & 0.1371920 & 0.8908790\\
+\hline
+RectalSex30d1 & -0.1627456 & 0.6172379 & -0.2636675 & 0.7920361\\
+\hline
+AbPain1 & 0.2969178 & 0.1771403 & 1.6761734 & 0.0937042\\
+\hline
+SignDischarge1 & 0.1330009 & 0.1306664 & 1.0178660 & 0.3087416\\
+\hline
+SignDysuria1 & 0.1954606 & 0.1812469 & 1.0784219 & 0.2808455\\
+\hline
+CondomUse2 & -0.1553543 & 0.2725108 & -0.5700849 & 0.5686201\\
+\hline
+CondomUse3 & -0.4582270 & 0.2819913 & -1.6249684 & 0.1041693\\
+\hline
+SignItch1 & -0.2209724 & 0.1750560 & -1.2622958 & 0.2068424\\
+\hline
+SignLesion1 & -0.2541307 & 0.3787052 & -0.6710513 & 0.5021878\\
+\hline
+SignRash1 & -0.0638066 & 0.4592994 & -0.1389215 & 0.8895122\\
+\hline
+SignLymph1 & 0.2368538 & 0.5922357 & 0.3999317 & 0.6892069\\
+\hline
+\cellcolor{blue}{\textcolor{white}{InvVagAtExam1}} & \cellcolor{blue}{\textcolor{white}{0.5726933}} & \cellcolor{blue}{\textcolor{white}{0.2003764}} & \cellcolor{blue}{\textcolor{white}{2.8580874}} & \cellcolor{blue}{\textcolor{white}{0.0042620}}\\
+\hline
+\cellcolor{blue}{\textcolor{white}{DischargeExam1}} & \cellcolor{blue}{\textcolor{white}{-0.5805191}} & \cellcolor{blue}{\textcolor{white}{0.2691414}} & \cellcolor{blue}{\textcolor{white}{-2.1569301}} & \cellcolor{blue}{\textcolor{white}{0.0310111}}\\
+\hline
+AbnormNodeExam1 & 0.0801562 & 0.5157541 & 0.1554155 & 0.8764938\\
+\hline
+\end{tabular}
+\end{table}
+
 \hypertarget{descriptive-analysis}{%
 \section{Descriptive Analysis}\label{descriptive-analysis}}
+
+The percentage of right-censored data in the data set is given below
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{dim}\NormalTok{(std\_data[std\_data}\SpecialCharTok{$}\NormalTok{Reinfection }\SpecialCharTok{==} \DecValTok{0}\NormalTok{,])[[}\DecValTok{1}\NormalTok{]]}\SpecialCharTok{/}\FunctionTok{dim}\NormalTok{(std\_data)[[}\DecValTok{1}\NormalTok{]]}\SpecialCharTok{*}\DecValTok{100}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> [1] 60.4333
+\end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -223,7 +295,7 @@ Q: What is the offset(log(TimeUntilReInf))? I don't understand this to be honest
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{practical_files/figure-latex/unnamed-chunk-3-1.pdf}
+\includegraphics{practical_files/figure-latex/unnamed-chunk-4-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -233,7 +305,7 @@ Q: What is the offset(log(TimeUntilReInf))? I don't understand this to be honest
 
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-4}Marital Status Frequency in each Level.}
+\caption{\label{tab:unnamed-chunk-5}Marital Status Frequency in each Level.}
 \centering
 \begin{tabular}[t]{l|r}
 \hline
@@ -256,7 +328,7 @@ S & 789\\
 
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-4}Sign of Discharge Frequency in each Level.}
+\caption{\label{tab:unnamed-chunk-5}Sign of Discharge Frequency in each Level.}
 \centering
 \begin{tabular}[t]{l|r}
 \hline
@@ -277,7 +349,7 @@ Sign of Discharge & Frequency\\
 
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-4}Discharge at Exam Frequency in each Level.}
+\caption{\label{tab:unnamed-chunk-5}Discharge at Exam Frequency in each Level.}
 \centering
 \begin{tabular}[t]{l|r}
 \hline
@@ -298,19 +370,19 @@ Discharge at Exam & Frequency\\
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{ggpairs}\NormalTok{(std\_data[,continuous.variables])}
+\FunctionTok{ggpairs}\NormalTok{(std\_data[,continuous.covar])}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{practical_files/figure-latex/unnamed-chunk-5-1.pdf}
+\includegraphics{practical_files/figure-latex/unnamed-chunk-6-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{corrplot}\NormalTok{(}\FunctionTok{cor}\NormalTok{(std\_data[, continuous.variables]))}
+\FunctionTok{corrplot}\NormalTok{(}\FunctionTok{cor}\NormalTok{(std\_data[, continuous.covar])) }\CommentTok{\# Correlation between continuous variables. }
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{practical_files/figure-latex/unnamed-chunk-5-2.pdf}
+\includegraphics{practical_files/figure-latex/unnamed-chunk-6-2.pdf}
 Note that age and years of schooling are somewhat correlated. \textbf{Could do some more EDA probably, and should remove some of this also.}
 
 \hypertarget{nonparametric-analysis}{%
@@ -318,9 +390,77 @@ Note that age and years of schooling are somewhat correlated. \textbf{Could do s
 
 The survival curve is estimated by means of Kaplan-Meier and plotted below. The curve below shows the general survival in the data set.
 
-\includegraphics{practical_files/figure-latex/unnamed-chunk-6-1.pdf}
+\includegraphics{practical_files/figure-latex/unnamed-chunk-7-1.pdf}
 
-The median survival time is 247 days.
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{s1.CondomUse }\OtherTok{\textless{}{-}} \FunctionTok{with}\NormalTok{(std\_data, }\FunctionTok{Surv}\NormalTok{(TimeUntilReinf, Reinfection) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ CondomUse)}
+\NormalTok{s1fit.CondomUse }\OtherTok{\textless{}{-}} \FunctionTok{survfit}\NormalTok{(s1.CondomUse)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{font =} \DecValTok{2}\NormalTok{, }\AttributeTok{font.axis =} \DecValTok{2}\NormalTok{, }\AttributeTok{font.lab =} \DecValTok{2}\NormalTok{, }\AttributeTok{las =} \DecValTok{1}\NormalTok{, }\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(s1fit.CondomUse, }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{), }\AttributeTok{xlab =} \StringTok{"Time to reinfection [days]"}\NormalTok{,}
+     \AttributeTok{ylab =} \FunctionTok{expression}\NormalTok{(}\FunctionTok{bolditalic}\NormalTok{(}\FunctionTok{hat}\NormalTok{(S)(t))),}
+     \AttributeTok{yaxs =} \StringTok{"i"}\NormalTok{, }\AttributeTok{xaxs =} \StringTok{"i"}\NormalTok{, }\AttributeTok{bty =} \StringTok{"n"}\NormalTok{, }\AttributeTok{lty =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{), }\AttributeTok{lwd =} \FunctionTok{rep}\NormalTok{(}\DecValTok{3}\NormalTok{, }\AttributeTok{length.out =} \DecValTok{3}\NormalTok{),}
+     \AttributeTok{conf.int =}\NormalTok{ F)}
+\FunctionTok{legend}\NormalTok{(}\StringTok{"topright"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{levels}\NormalTok{(std\_data}\SpecialCharTok{$}\NormalTok{CondomUse), }\AttributeTok{title =} \StringTok{"Condom Use"}\NormalTok{,}
+       \AttributeTok{bty =} \StringTok{"n"}\NormalTok{, }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{), }\AttributeTok{lty =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{), }\AttributeTok{lwd =} \FunctionTok{rep}\NormalTok{(}\DecValTok{3}\NormalTok{, }\AttributeTok{length.out =} \DecValTok{3}\NormalTok{))}
+\FunctionTok{title}\NormalTok{(}\StringTok{"Survival Function as Function of Condom Use"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{practical_files/figure-latex/unnamed-chunk-8-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{s1.Ethnicity }\OtherTok{\textless{}{-}} \FunctionTok{with}\NormalTok{(std\_data, }\FunctionTok{Surv}\NormalTok{(TimeUntilReinf, Reinfection) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Ethnicity)}
+\NormalTok{s1fit.Ethnicity }\OtherTok{\textless{}{-}} \FunctionTok{survfit}\NormalTok{(s1.Ethnicity)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{font =} \DecValTok{2}\NormalTok{, }\AttributeTok{font.axis =} \DecValTok{2}\NormalTok{, }\AttributeTok{font.lab =} \DecValTok{2}\NormalTok{, }\AttributeTok{las =} \DecValTok{1}\NormalTok{, }\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(s1fit.Ethnicity, }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{), }\AttributeTok{xlab =} \StringTok{"Time to reinfection [days]"}\NormalTok{,}
+     \AttributeTok{ylab =} \FunctionTok{expression}\NormalTok{(}\FunctionTok{bolditalic}\NormalTok{(}\FunctionTok{hat}\NormalTok{(S)(t))),}
+     \AttributeTok{yaxs =} \StringTok{"i"}\NormalTok{, }\AttributeTok{xaxs =} \StringTok{"i"}\NormalTok{, }\AttributeTok{bty =} \StringTok{"n"}\NormalTok{, }\AttributeTok{lty =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{), }\AttributeTok{lwd =} \FunctionTok{rep}\NormalTok{(}\DecValTok{3}\NormalTok{, }\AttributeTok{length.out =} \DecValTok{2}\NormalTok{),}
+     \AttributeTok{conf.int =}\NormalTok{ F)}
+\FunctionTok{legend}\NormalTok{(}\StringTok{"topright"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{levels}\NormalTok{(std\_data}\SpecialCharTok{$}\NormalTok{Ethnicity), }\AttributeTok{title =} \StringTok{"Ethnicity"}\NormalTok{,}
+       \AttributeTok{bty =} \StringTok{"n"}\NormalTok{, }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{), }\AttributeTok{lty =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{), }\AttributeTok{lwd =} \FunctionTok{rep}\NormalTok{(}\DecValTok{3}\NormalTok{, }\AttributeTok{length.out =} \DecValTok{2}\NormalTok{))}
+\FunctionTok{title}\NormalTok{(}\StringTok{"Survival Function as Function of Ethnicity"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{practical_files/figure-latex/unnamed-chunk-9-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{s1.SignDischarge }\OtherTok{\textless{}{-}} \FunctionTok{with}\NormalTok{(std\_data, }\FunctionTok{Surv}\NormalTok{(TimeUntilReinf, Reinfection) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ SignDischarge)}
+\NormalTok{s1fit.SignDischarge }\OtherTok{\textless{}{-}} \FunctionTok{survfit}\NormalTok{(s1.SignDischarge)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{font =} \DecValTok{2}\NormalTok{, }\AttributeTok{font.axis =} \DecValTok{2}\NormalTok{, }\AttributeTok{font.lab =} \DecValTok{2}\NormalTok{, }\AttributeTok{las =} \DecValTok{1}\NormalTok{, }\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(s1fit.SignDischarge, }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{), }\AttributeTok{xlab =} \StringTok{"Time to reinfection [days]"}\NormalTok{,}
+     \AttributeTok{ylab =} \FunctionTok{expression}\NormalTok{(}\FunctionTok{bolditalic}\NormalTok{(}\FunctionTok{hat}\NormalTok{(S)(t))),}
+     \AttributeTok{yaxs =} \StringTok{"i"}\NormalTok{, }\AttributeTok{xaxs =} \StringTok{"i"}\NormalTok{, }\AttributeTok{bty =} \StringTok{"n"}\NormalTok{, }\AttributeTok{lty =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{), }\AttributeTok{lwd =} \FunctionTok{rep}\NormalTok{(}\DecValTok{3}\NormalTok{, }\AttributeTok{length.out =} \DecValTok{2}\NormalTok{),}
+     \AttributeTok{conf.int =}\NormalTok{ F)}
+\FunctionTok{legend}\NormalTok{(}\StringTok{"topright"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{levels}\NormalTok{(std\_data}\SpecialCharTok{$}\NormalTok{SignDischarge), }\AttributeTok{title =} \StringTok{"Sign of Discharge"}\NormalTok{,}
+       \AttributeTok{bty =} \StringTok{"n"}\NormalTok{, }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{), }\AttributeTok{lty =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{), }\AttributeTok{lwd =} \FunctionTok{rep}\NormalTok{(}\DecValTok{3}\NormalTok{, }\AttributeTok{length.out =} \DecValTok{2}\NormalTok{))}
+\FunctionTok{title}\NormalTok{(}\StringTok{"Survival Function as Function of Sign of Discharge"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{practical_files/figure-latex/unnamed-chunk-10-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{s1.NumPartners }\OtherTok{\textless{}{-}} \FunctionTok{with}\NormalTok{(std\_data, }\FunctionTok{Surv}\NormalTok{(TimeUntilReinf, Reinfection) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ NumPartners)}
+\NormalTok{s1fit.NumPartners }\OtherTok{\textless{}{-}} \FunctionTok{survfit}\NormalTok{(s1.NumPartners)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{font =} \DecValTok{2}\NormalTok{, }\AttributeTok{font.axis =} \DecValTok{2}\NormalTok{, }\AttributeTok{font.lab =} \DecValTok{2}\NormalTok{, }\AttributeTok{las =} \DecValTok{1}\NormalTok{, }\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(s1fit.NumPartners, }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{5}\NormalTok{,}\DecValTok{6}\NormalTok{,}\DecValTok{7}\NormalTok{,}\DecValTok{8}\NormalTok{,}\DecValTok{9}\NormalTok{), }\AttributeTok{xlab =} \StringTok{"Time to reinfection [days]"}\NormalTok{,}
+     \AttributeTok{ylab =} \FunctionTok{expression}\NormalTok{(}\FunctionTok{bolditalic}\NormalTok{(}\FunctionTok{hat}\NormalTok{(S)(t))),}
+     \AttributeTok{yaxs =} \StringTok{"i"}\NormalTok{, }\AttributeTok{xaxs =} \StringTok{"i"}\NormalTok{, }\AttributeTok{bty =} \StringTok{"n"}\NormalTok{, }\AttributeTok{lty =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{5}\NormalTok{,}\DecValTok{6}\NormalTok{,}\DecValTok{7}\NormalTok{,}\DecValTok{8}\NormalTok{,}\DecValTok{9}\NormalTok{), }\AttributeTok{lwd =} \FunctionTok{rep}\NormalTok{(}\DecValTok{3}\NormalTok{, }\AttributeTok{length.out =} \DecValTok{9}\NormalTok{),}
+     \AttributeTok{conf.int =}\NormalTok{ F)}
+\FunctionTok{legend}\NormalTok{(}\StringTok{"topright"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{levels}\NormalTok{(}\FunctionTok{as.factor}\NormalTok{(std\_data}\SpecialCharTok{$}\NormalTok{NumPartners)), }\AttributeTok{title =} \StringTok{"Number of Partners"}\NormalTok{,}
+       \AttributeTok{bty =} \StringTok{"n"}\NormalTok{, }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{5}\NormalTok{,}\DecValTok{6}\NormalTok{,}\DecValTok{7}\NormalTok{,}\DecValTok{8}\NormalTok{,}\DecValTok{9}\NormalTok{), }\AttributeTok{lty =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{5}\NormalTok{,}\DecValTok{6}\NormalTok{,}\DecValTok{7}\NormalTok{,}\DecValTok{8}\NormalTok{,}\DecValTok{9}\NormalTok{), }\AttributeTok{lwd =} \FunctionTok{rep}\NormalTok{(}\DecValTok{3}\NormalTok{, }\AttributeTok{length.out =} \DecValTok{9}\NormalTok{))}
+\FunctionTok{title}\NormalTok{(}\StringTok{"Survival Function as Function of Number of Partners"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{practical_files/figure-latex/unnamed-chunk-11-1.pdf}
+
+The median survival time is 705 days.
 
 Comparison of survival functions by means of nonparametric tests, such as the logrank test.
 
@@ -339,14 +479,14 @@ Below, logrank test for all curves plotted above are done. Other types of tests 
 #> Parameters: rho=0, lambda=0
 #> Distribution: counting process approach
 #> 
-#> Data: Surv(TimeUntilReinf, cens) by CondomUse
+#> Data: Surv(TimeUntilReinf, Reinfection) by CondomUse
 #> 
 #>               N Observed Expected    O-E (O-E)^2/E (O-E)^2/V
-#> CondomUse=1  54       54     51.8   2.16    0.0902    0.0968
-#> CondomUse=2 511      511    457.3  53.66    6.2948   13.4467
-#> CondomUse=3 312      312    367.8 -55.82    8.4704   14.8506
+#> CondomUse=1  54       21     19.3   1.72     0.154     0.164
+#> CondomUse=2 511      210    185.0  24.97     3.369     7.338
+#> CondomUse=3 312      116    142.7 -26.69     4.993     8.606
 #> 
-#> Chisq= 15.1 on 2 degrees of freedom, p-value= 0.000514
+#> Chisq= 8.6 on 2 degrees of freedom, p-value= 0.0133
 #> Alternative hypothesis: survival functions not equal
 \end{verbatim}
 
@@ -363,13 +503,13 @@ Below, logrank test for all curves plotted above are done. Other types of tests 
 #> Parameters: rho=0, lambda=0
 #> Distribution: counting process approach
 #> 
-#> Data: Surv(TimeUntilReinf, cens) by Ethnicity
+#> Data: Surv(TimeUntilReinf, Reinfection) by Ethnicity
 #> 
 #>               N Observed Expected   O-E (O-E)^2/E (O-E)^2/V
-#> Ethnicity=B 585      585      603 -18.3     0.555       1.8
-#> Ethnicity=W 292      292      274  18.3     1.224       1.8
+#> Ethnicity=B 585      264      238  25.9      2.82      9.03
+#> Ethnicity=W 292       83      109 -25.9      6.16      9.03
 #> 
-#> Statistic Z= 1.3, p-value= 0.18
+#> Statistic Z= -3, p-value= 0.00266
 #> Alternative hypothesis: survival functions not equal
 \end{verbatim}
 
@@ -386,13 +526,13 @@ Below, logrank test for all curves plotted above are done. Other types of tests 
 #> Parameters: rho=0, lambda=0
 #> Distribution: counting process approach
 #> 
-#> Data: Surv(TimeUntilReinf, cens) by SignDischarge
+#> Data: Surv(TimeUntilReinf, Reinfection) by SignDischarge
 #> 
-#>                   N Observed Expected    O-E (O-E)^2/E (O-E)^2/V
-#> SignDischarge=0 472      472      472 -0.461  0.000450   0.00098
-#> SignDischarge=1 405      405      405  0.461  0.000525   0.00098
+#>                   N Observed Expected   O-E (O-E)^2/E (O-E)^2/V
+#> SignDischarge=0 472      171      187 -15.6      1.31      2.84
+#> SignDischarge=1 405      176      160  15.6      1.53      2.84
 #> 
-#> Statistic Z= 0, p-value= 0.975
+#> Statistic Z= 1.7, p-value= 0.0918
 #> Alternative hypothesis: survival functions not equal
 \end{verbatim}
 
@@ -409,20 +549,20 @@ Below, logrank test for all curves plotted above are done. Other types of tests 
 #> Parameters: rho=0, lambda=0
 #> Distribution: counting process approach
 #> 
-#> Data: Surv(TimeUntilReinf, cens) by NumPartners
+#> Data: Surv(TimeUntilReinf, Reinfection) by NumPartners
 #> 
 #>                  N Observed Expected     O-E
-#> NumPartners=0   70       70   67.796   2.204
-#> NumPartners=1  607      607  626.599 -19.599
-#> NumPartners=2  146      146  134.200  11.800
-#> NumPartners=3   39       39   33.838   5.162
-#> NumPartners=4    5        5    1.417   3.583
-#> NumPartners=5    6        6    4.944   1.056
-#> NumPartners=6    1        1    4.895  -3.895
-#> NumPartners=10   2        2    3.104  -1.104
-#> NumPartners=19   1        1    0.206   0.794
+#> NumPartners=0   70       29  27.5754   1.425
+#> NumPartners=1  607      234 244.7937 -10.794
+#> NumPartners=2  146       61  55.5667   5.433
+#> NumPartners=3   39       16  14.0435   1.957
+#> NumPartners=4    5        4   0.6262   3.374
+#> NumPartners=5    6        2   1.8913   0.109
+#> NumPartners=6    1        1   1.2190  -0.219
+#> NumPartners=10   2       29   1.1948  27.805
+#> NumPartners=19   1      234   0.0894 233.911
 #> 
-#> Statistic Z= 0.7, p-value= 0.488
+#> Statistic Z= 269, p-value= 0
 #> Alternative hypothesis: survival functions not equal
 \end{verbatim}
 
@@ -435,40 +575,47 @@ After trying to fit Weibull, log-logistic and lognormal log-linear models, we co
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\NormalTok{s2 }\OtherTok{\textless{}{-}} \FunctionTok{with}\NormalTok{(std\_data, }\FunctionTok{Surv}\NormalTok{(TimeUntilReinf, Reinfection))}
 \CommentTok{\# This should be done first with Weibull, to avoid having the log{-}fit here. }
-\NormalTok{loglo.full }\OtherTok{\textless{}{-}} \FunctionTok{survreg}\NormalTok{(s2 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Ethnicity }\SpecialCharTok{+}\NormalTok{ Age }\SpecialCharTok{+}\NormalTok{ NumPartners }\SpecialCharTok{+}\NormalTok{ CondomUse }\SpecialCharTok{+}\NormalTok{ YearsSchool }\SpecialCharTok{+}\NormalTok{ SignDischarge, }\AttributeTok{data =}\NormalTok{ std\_data, }\AttributeTok{dist =} \StringTok{"loglo"}\NormalTok{)}
-\NormalTok{weibull.full }\OtherTok{\textless{}{-}} \FunctionTok{update}\NormalTok{(loglo.full, }\AttributeTok{dist =} \StringTok{"weibull"}\NormalTok{)}
-\FunctionTok{summary}\NormalTok{(weibull.full)}
+\NormalTok{weibull.full  }\OtherTok{\textless{}{-}} \FunctionTok{survreg}\NormalTok{(s2 }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Age }\SpecialCharTok{+}\NormalTok{ NumPartners }\SpecialCharTok{+}\NormalTok{ CondomUse }\SpecialCharTok{+}\NormalTok{ YearsSchool }
+                  \SpecialCharTok{+}\NormalTok{ InitInfect }\SpecialCharTok{+}\NormalTok{ InvVagAtExam }\SpecialCharTok{+}\NormalTok{ DischargeExam, }\AttributeTok{data =}\NormalTok{ std\_data, }\AttributeTok{dist =} \StringTok{"weibull"}\NormalTok{)}
+\NormalTok{(s.weibull }\OtherTok{\textless{}{-}} \FunctionTok{summary}\NormalTok{(weibull.full))}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
 #> 
 #> Call:
-#> survreg(formula = s2 ~ Ethnicity + Age + NumPartners + CondomUse + 
-#>     YearsSchool + SignDischarge, data = std_data, dist = "weibull")
-#>                    Value Std. Error     z       p
-#> (Intercept)     5.310720   0.328119 16.19 < 2e-16
-#> EthnicityW     -0.110680   0.085688 -1.29    0.20
-#> Age            -0.001799   0.008523 -0.21    0.83
-#> NumPartners    -0.010662   0.040943 -0.26    0.79
-#> CondomUse2      0.009896   0.169834  0.06    0.95
-#> CondomUse3      0.285457   0.175474  1.63    0.10
-#> YearsSchool     0.043070   0.026987  1.60    0.11
-#> SignDischarge1 -0.000572   0.080803 -0.01    0.99
-#> Log(scale)      0.166530   0.027666  6.02 1.8e-09
+#> survreg(formula = s2 ~ Age + NumPartners + CondomUse + YearsSchool + 
+#>     InitInfect + InvVagAtExam + DischargeExam, data = std_data, 
+#>     dist = "weibull")
+#>                  Value Std. Error     z       p
+#> (Intercept)     3.9516     0.6338  6.23 4.5e-10
+#> Age             0.0101     0.0161  0.63 0.52912
+#> NumPartners    -0.0139     0.0681 -0.20 0.83835
+#> CondomUse2      0.0788     0.2995  0.26 0.79244
+#> CondomUse3      0.4228     0.3106  1.36 0.17350
+#> YearsSchool     0.1704     0.0487  3.50 0.00047
+#> InitInfect2     0.5110     0.1907  2.68 0.00738
+#> InitInfect3     0.3149     0.1915  1.64 0.10011
+#> InvVagAtExam1  -0.5092     0.2212 -2.30 0.02133
+#> DischargeExam1  0.4601     0.2894  1.59 0.11184
+#> Log(scale)      0.2606     0.0445  5.85 4.9e-09
 #> 
-#> Scale= 1.18 
+#> Scale= 1.3 
 #> 
 #> Weibull distribution
-#> Loglik(model)= -6031.9   Loglik(intercept only)= -6040.1
-#>  Chisq= 16.29 on 7 degrees of freedom, p= 0.023 
-#> Number of Newton-Raphson Iterations: 6 
+#> Loglik(model)= -2674.9   Loglik(intercept only)= -2697.1
+#>  Chisq= 44.43 on 9 degrees of freedom, p= 1.2e-06 
+#> Number of Newton-Raphson Iterations: 7 
 #> n= 877
 \end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{\#weibull.full \textless{}{-} survreg(s2 \textasciitilde{} ., data = std\_data, dist = "weibull")}
+\CommentTok{\#(s.weibull \textless{}{-} summary(weibull.full))}
+
 \NormalTok{weibull.pred }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(weibull.full, }\AttributeTok{type =} \StringTok{"linear"}\NormalTok{)}
 \NormalTok{resids.weibull }\OtherTok{\textless{}{-}}\NormalTok{ (}\FunctionTok{log}\NormalTok{(std\_data}\SpecialCharTok{$}\NormalTok{TimeUntilReinf) }\SpecialCharTok{{-}}\NormalTok{ weibull.pred) }\SpecialCharTok{/}\NormalTok{ weibull.full}\SpecialCharTok{$}\NormalTok{scale}
 \end{Highlighting}
@@ -477,7 +624,7 @@ After trying to fit Weibull, log-logistic and lognormal log-linear models, we co
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{par}\NormalTok{(}\AttributeTok{font =} \DecValTok{2}\NormalTok{, }\AttributeTok{font.axis =} \DecValTok{2}\NormalTok{, }\AttributeTok{font.lab =} \DecValTok{2}\NormalTok{, }\AttributeTok{las =} \DecValTok{1}\NormalTok{, }\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{2}\NormalTok{))}
-\FunctionTok{plot}\NormalTok{(}\FunctionTok{survfit}\NormalTok{(}\FunctionTok{Surv}\NormalTok{(resids.weibull, std\_data}\SpecialCharTok{$}\NormalTok{cens) }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{), }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{), }\AttributeTok{xlab =} \StringTok{"Residuals"}\NormalTok{,}
+\FunctionTok{plot}\NormalTok{(}\FunctionTok{survfit}\NormalTok{(}\FunctionTok{Surv}\NormalTok{(resids.weibull, std\_data}\SpecialCharTok{$}\NormalTok{Reinfection) }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{), }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{), }\AttributeTok{xlab =} \StringTok{"Residuals"}\NormalTok{,}
      \AttributeTok{ylab =} \FunctionTok{expression}\NormalTok{(}\FunctionTok{bolditalic}\NormalTok{(}\FunctionTok{hat}\NormalTok{(S)(t))),}
      \AttributeTok{lty =} \DecValTok{1}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{3}\NormalTok{, }\AttributeTok{yaxs =} \StringTok{"i"}\NormalTok{, }\AttributeTok{xaxs =} \StringTok{"i"}\NormalTok{, }\AttributeTok{bty =} \StringTok{"n"}\NormalTok{)}
 \FunctionTok{title}\NormalTok{(}\StringTok{"Residuals of the Weibull Regression Model"}\NormalTok{)}
@@ -497,34 +644,195 @@ The residuals seem to fit relatively nicely to the Gumbel distribution, which in
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{cumhazPlot}\NormalTok{(std\_data}\SpecialCharTok{$}\NormalTok{TimeUntilReinf, std\_data}\SpecialCharTok{$}\NormalTok{cens,}\AttributeTok{col =} \DecValTok{4}\NormalTok{, }\AttributeTok{distr =} \FunctionTok{c}\NormalTok{(}\StringTok{"wei"}\NormalTok{, }\StringTok{"loglo"}\NormalTok{, }\StringTok{"lognormal"}\NormalTok{), }\AttributeTok{font.lab =} \DecValTok{4}\NormalTok{)}
+\NormalTok{lognormal.full }\OtherTok{\textless{}{-}} \FunctionTok{update}\NormalTok{(weibull.full, }\AttributeTok{dist =} \StringTok{"lognormal"}\NormalTok{)}
+\FunctionTok{summary}\NormalTok{(lognormal.full)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> 
+#> Call:
+#> survreg(formula = s2 ~ Age + NumPartners + CondomUse + YearsSchool + 
+#>     InitInfect + InvVagAtExam + DischargeExam, data = std_data, 
+#>     dist = "lognormal")
+#>                    Value Std. Error     z       p
+#> (Intercept)     2.881331   0.776808  3.71 0.00021
+#> Age            -0.000895   0.018939 -0.05 0.96232
+#> NumPartners    -0.019853   0.077571 -0.26 0.79800
+#> CondomUse2      0.411402   0.360931  1.14 0.25435
+#> CondomUse3      0.811166   0.375119  2.16 0.03059
+#> YearsSchool     0.204027   0.057861  3.53 0.00042
+#> InitInfect2     0.373146   0.242880  1.54 0.12446
+#> InitInfect3     0.318740   0.249560  1.28 0.20153
+#> InvVagAtExam1  -0.777588   0.270837 -2.87 0.00409
+#> DischargeExam1  0.725573   0.365444  1.99 0.04709
+#> Log(scale)      0.724527   0.039725 18.24 < 2e-16
+#> 
+#> Scale= 2.06 
+#> 
+#> Log Normal distribution
+#> Loglik(model)= -2688.6   Loglik(intercept only)= -2709.4
+#>  Chisq= 41.51 on 9 degrees of freedom, p= 4e-06 
+#> Number of Newton-Raphson Iterations: 4 
+#> n= 877
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{lognormal.pred }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(lognormal.full, }\AttributeTok{type =} \StringTok{"linear"}\NormalTok{)}
+\NormalTok{resids.logno }\OtherTok{\textless{}{-}}\NormalTok{ (}\FunctionTok{log}\NormalTok{(std\_data}\SpecialCharTok{$}\NormalTok{TimeUntilReinf) }\SpecialCharTok{{-}}\NormalTok{ lognormal.pred) }\SpecialCharTok{/}\NormalTok{ lognormal.full}\SpecialCharTok{$}\NormalTok{scale}
+
+\FunctionTok{par}\NormalTok{(}\AttributeTok{font =} \DecValTok{2}\NormalTok{, }\AttributeTok{font.axis =} \DecValTok{2}\NormalTok{, }\AttributeTok{font.lab =} \DecValTok{2}\NormalTok{, }\AttributeTok{las =} \DecValTok{1}\NormalTok{, }\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(}\FunctionTok{survfit}\NormalTok{(}\FunctionTok{Surv}\NormalTok{(resids.logno, std\_data}\SpecialCharTok{$}\NormalTok{Reinfection) }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{), }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{), }\AttributeTok{xlab =} \StringTok{"Residuals"}\NormalTok{,}
+     \AttributeTok{ylab =} \FunctionTok{expression}\NormalTok{(}\FunctionTok{bolditalic}\NormalTok{(}\FunctionTok{hat}\NormalTok{(S)(t))),}
+     \AttributeTok{lty =} \DecValTok{1}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{3}\NormalTok{, }\AttributeTok{yaxs =} \StringTok{"i"}\NormalTok{, }\AttributeTok{xaxs =} \StringTok{"i"}\NormalTok{, }\AttributeTok{bty =} \StringTok{"n"}\NormalTok{)}
+\FunctionTok{title}\NormalTok{(}\StringTok{"Residuals of the Lognormal Regression Model"}\NormalTok{)}
+\FunctionTok{curve}\NormalTok{(}\FunctionTok{pnorm}\NormalTok{(x, }\AttributeTok{lower.tail =}\NormalTok{ F), }\AttributeTok{from =} \FunctionTok{min}\NormalTok{(resids.logno), }\AttributeTok{to =} \FunctionTok{max}\NormalTok{(resids.logno), }\AttributeTok{col =} \DecValTok{3}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{3}\NormalTok{,}
+      \AttributeTok{add =} \ConstantTok{TRUE}\NormalTok{)}
+\FunctionTok{legend}\NormalTok{(}\StringTok{"bottomleft"}\NormalTok{, }\FunctionTok{c}\NormalTok{(}\StringTok{"KM estimate"}\NormalTok{, }\StringTok{"95\% {-} CI"}\NormalTok{, }\StringTok{"Stand. Normal Distribution"}\NormalTok{),}
+       \AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{), }\AttributeTok{lty =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{lwd =} \DecValTok{3}\NormalTok{, }\AttributeTok{bty =} \StringTok{"n"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{practical_files/figure-latex/fit-lognormal-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{loglo.full }\OtherTok{\textless{}{-}} \FunctionTok{update}\NormalTok{(weibull.full, }\AttributeTok{dist =} \StringTok{"loglo"}\NormalTok{)}
+\FunctionTok{summary}\NormalTok{(loglo.full)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> 
+#> Call:
+#> survreg(formula = s2 ~ Age + NumPartners + CondomUse + YearsSchool + 
+#>     InitInfect + InvVagAtExam + DischargeExam, data = std_data, 
+#>     dist = "loglo")
+#>                   Value Std. Error     z       p
+#> (Intercept)     3.26979    0.72210  4.53 5.9e-06
+#> Age             0.00152    0.01777  0.09 0.93188
+#> NumPartners    -0.05643    0.07503 -0.75 0.45201
+#> CondomUse2      0.26490    0.35206  0.75 0.45179
+#> CondomUse3      0.63442    0.36424  1.74 0.08156
+#> YearsSchool     0.19049    0.05365  3.55 0.00038
+#> InitInfect2     0.42277    0.21873  1.93 0.05326
+#> InitInfect3     0.32407    0.22067  1.47 0.14194
+#> InvVagAtExam1  -0.70568    0.25677 -2.75 0.00599
+#> DischargeExam1  0.54808    0.34697  1.58 0.11420
+#> Log(scale)      0.09847    0.04479  2.20 0.02791
+#> 
+#> Scale= 1.1 
+#> 
+#> Log logistic distribution
+#> Loglik(model)= -2680.2   Loglik(intercept only)= -2701.5
+#>  Chisq= 42.58 on 9 degrees of freedom, p= 2.6e-06 
+#> Number of Newton-Raphson Iterations: 4 
+#> n= 877
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{loglo.pred }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(loglo.full, }\AttributeTok{type =} \StringTok{"linear"}\NormalTok{)}
+\NormalTok{resids.loglo }\OtherTok{\textless{}{-}}\NormalTok{ (}\FunctionTok{log}\NormalTok{(std\_data}\SpecialCharTok{$}\NormalTok{TimeUntilReinf) }\SpecialCharTok{{-}}\NormalTok{ loglo.pred) }\SpecialCharTok{/}\NormalTok{ loglo.full}\SpecialCharTok{$}\NormalTok{scale}
+
+\FunctionTok{par}\NormalTok{(}\AttributeTok{font =} \DecValTok{2}\NormalTok{, }\AttributeTok{font.axis =} \DecValTok{2}\NormalTok{, }\AttributeTok{font.lab =} \DecValTok{2}\NormalTok{, }\AttributeTok{las =} \DecValTok{1}\NormalTok{, }\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(}\FunctionTok{survfit}\NormalTok{(}\FunctionTok{Surv}\NormalTok{(resids.loglo, std\_data}\SpecialCharTok{$}\NormalTok{Reinfection) }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{), }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{), }\AttributeTok{xlab =} \StringTok{"Residuals"}\NormalTok{,}
+     \AttributeTok{ylab =} \FunctionTok{expression}\NormalTok{(}\FunctionTok{bolditalic}\NormalTok{(}\FunctionTok{hat}\NormalTok{(S)(t))),}
+     \AttributeTok{lty =} \DecValTok{1}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{3}\NormalTok{, }\AttributeTok{yaxs =} \StringTok{"i"}\NormalTok{, }\AttributeTok{xaxs =} \StringTok{"i"}\NormalTok{, }\AttributeTok{bty =} \StringTok{"n"}\NormalTok{)}
+\FunctionTok{title}\NormalTok{(}\StringTok{"Residuals of the log{-}logistic Regression Model"}\NormalTok{)}
+\FunctionTok{curve}\NormalTok{(}\FunctionTok{plogis}\NormalTok{(x, }\AttributeTok{lower.tail =}\NormalTok{ F), }\AttributeTok{from =} \FunctionTok{min}\NormalTok{(resids.loglo), }\AttributeTok{to =} \FunctionTok{max}\NormalTok{(resids.loglo), }\AttributeTok{col =} \DecValTok{3}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{3}\NormalTok{,}
+      \AttributeTok{add =} \ConstantTok{TRUE}\NormalTok{)}
+\FunctionTok{legend}\NormalTok{(}\StringTok{"bottomleft"}\NormalTok{, }\FunctionTok{c}\NormalTok{(}\StringTok{"KM estimate"}\NormalTok{, }\StringTok{"95\% {-} CI"}\NormalTok{, }\StringTok{"Stand. Logistic Distribution"}\NormalTok{),}
+       \AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{), }\AttributeTok{lty =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{lwd =} \DecValTok{3}\NormalTok{, }\AttributeTok{bty =} \StringTok{"n"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{practical_files/figure-latex/fit-loglog-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cumhazPlot}\NormalTok{(std\_data}\SpecialCharTok{$}\NormalTok{TimeUntilReinf, std\_data}\SpecialCharTok{$}\NormalTok{Reinfection,}\AttributeTok{col =} \DecValTok{4}\NormalTok{, }\AttributeTok{distr =} \FunctionTok{c}\NormalTok{(}\StringTok{"wei"}\NormalTok{, }\StringTok{"loglo"}\NormalTok{, }\StringTok{"lognormal"}\NormalTok{), }\AttributeTok{font.lab =} \DecValTok{4}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \includegraphics{practical_files/figure-latex/cumhaz-plot-1.pdf}
 
-The probability plots above also show that the Weibull is the better parametric model for the data.
+The probability plots above also show that the Weibull is the better parametric model for the data, because the log-logistic and lognormal models clearly do not fit the line in the tails.
 
-But how do we interpret this model fit?
+But how do we interpret this model fit? First of all, the model we have fit has the expression
 
-The interpretation in terms of relative hazards (RHs) and the acceleration factor (AF) is \ldots{}
+\[
+Y = \ln(T) = \mu + \mathbf{\gamma}^T\mathbf{Z} + \sigma W,  
+\]
 
-Effect size measures:
+where \(W \sim EV(0,1)\),
 
-\begin{itemize}
-\tightlist
-\item
-  lognormal: acceleration factor.
-\item
-  weibull: HR.
-\item
-  log-logistic: OR.
-\end{itemize}
+\[
+\mathbf{\gamma}^T = (\gamma_{Age}, \gamma_{Ethn.}, \gamma_{NumPartn.}, \gamma_{Cond.}, \gamma_{YSchool}, \gamma_{SignDisch}) 
+\]
+
+are the estimated parameters and
+
+\[
+\mathbf{Z}^T = (Age, Ethn., NumPartn., Cond., YSchool, SignDisch), 
+\]
+
+is the vector of values. \textbf{These need to be changed according to the values used also!!} Thus, each of the quantities \(\exp(\gamma_i)\)s can be interpreted as the unitary change in time until reinfection (when the covariate \(i\) is continuous), or the change in time until reinfection when changing level (when the covariate \(i\) is categorical with different levels), when the other explanatory variables are kept fixed. \textbf{Any other interpretation of the model fit they are looking for you think?}
+
+In the Weibull model, the acceleration factor (AF) is calculated using the equation
+
+\[
+AF = \exp(-\hat{\gamma}_i)
+\]
+and the hazard ratio (HR) is calculated using the equation
+
+\[
+HR = \exp(-\hat{\gamma}_i/\hat{\sigma}).
+\]
+In this case, the model fit gives the scale \(\hat{\sigma} \approx\) 1.298. These values are calculated for each of the covariates below.
+
+\begin{table}
+
+\caption{\label{tab:unnamed-chunk-15}Parameter Estimates, AF and HR for each Parameter Estimate}
+\centering
+\begin{tabular}[t]{l|r|r|r}
+\hline
+  & Parameter.Estimate & AF & HR\\
+\hline
+(Intercept) & 3.9516047 & 0.0192238 & 0.0475893\\
+\hline
+Age & 0.0101018 & 0.9899491 & 0.9922457\\
+\hline
+NumPartners & -0.0138832 & 1.0139800 & 1.0107560\\
+\hline
+CondomUse2 & 0.0788112 & 0.9242144 & 0.9410747\\
+\hline
+CondomUse3 & 0.4227912 & 0.6552154 & 0.7219443\\
+\hline
+YearsSchool & 0.1704370 & 0.8432962 & 0.8769191\\
+\hline
+InitInfect2 & 0.5109972 & 0.5998971 & 0.6745026\\
+\hline
+InitInfect3 & 0.3149121 & 0.7298530 & 0.7845268\\
+\hline
+InvVagAtExam1 & -0.5091714 & 1.6639119 & 1.4804896\\
+\hline
+DischargeExam1 & 0.4601294 & 0.6312020 & 0.7014676\\
+\hline
+\end{tabular}
+\end{table}
+
+Consider an example using the covariate \texttt{CondomUse} when explaining the interpretation of the covariates in terms of the AF. From the table above it is apparent that the AF of \texttt{CondomUse3} versus \texttt{CondomUse1} is \(\approx\) 0.655. This means that the reinfection time for a person that never uses a condom is \(\approx\) 0.655 times the reinfection time for a person that always uses a condom \textbf{Not sure that this makes sense!? I think it makes sense with the coefficient value given from the model above, but does not make sense in real life, as this suggests that not using a condom is protective!} The interpretation in terms of the AF is similar when considering the other covariates, except for when considering the \texttt{Age} and \texttt{NumPartners}, which is not categorical \textbf{Perhaps it indeed makes sense to considering the Age in this way also, even though it is weird to treat the Age this way?}
+
+The relative hazards (RH) can be calculated using the equation \ldots{}
+
+\textbf{Is the relative hazards the same as the hazard ratio??}
 
 \hypertarget{fit-of-a-semi-parametric-survival-model}{%
 \section{Fit of a semi-parametric survival model}\label{fit-of-a-semi-parametric-survival-model}}
 
-The proportional hazards model is fit.
+The proportional hazards model is fit. \textbf{This is probably done in next lab!}
 
 \hypertarget{conclusions}{%
 \section{Conclusions}\label{conclusions}}

@@ -14,7 +14,7 @@ params:
 
 ```{r setup, include=FALSE}
 list(rm = ls())
-knitr::opts_chunk$set(echo = params$show_code, comment = "#>", eval = TRUE, warning = F)
+knitr::opts_chunk$set(echo = params$show_code, comment = "#>", eval = TRUE, warning = F, fig.height=4)
 library(tidyverse)
 library(corrplot)
 library(GGally)
@@ -52,15 +52,14 @@ colnames(std_data) <- variable.names <-c("ObsNum", "Ethnicity", "MaritalStatus",
         "SignDischarge","SignDysuria","CondomUse","SignItch","SignLesion",
         "SignRash","SignLymph","InvVagAtExam","DischargeExam","AbnormNodeExam", 
         "Reinfection", "TimeUntilReinf")
-non_factor_indices <- c(1, 4, 5, 7,23, 24) # I THINK Reinfection should be a factor as well!
-# This would mean that we should remove 23 from this list. 
+non_factor_indices <- c(1, 4, 5, 7,23, 24) 
 std_data[, variable.names[-non_factor_indices]] <- lapply(
   std_data[, variable.names[-non_factor_indices]],factor)
-std_data$cens <- rep(1, length = dim(std_data)[[1]]) # All uncensored, thus cens = 1 for all rows. 
 
-variables.chosen <- c("Age", "NumPartners", "CondomUse", "Ethnicity") # ETC!
-continuous.variables <- unlist(lapply(std_data, is.numeric))
-continuous.variables <- continuous.variables[-length(continuous.variables)] # Removing the cens-value. 
+covariates.chosen <- c("Age", "NumPartners", "CondomUse", 
+                      "YearsSchool", "InitInfect", "InvVagAtExam", "DischargeExam") # ETC!
+continuous.covar <- unlist(lapply(std_data, is.numeric)) 
+continuous.covar["Reinfection"] <- FALSE # Remove Reinfection also. 
 ```
 
 Naturally, the categorical variable which states if the woman is reinfected or not (`Reinfection`) will be used as a dependent variable in the analysis and the time until reinfection since the more time a subject is under study, the greater the risk of the event reoccurring.
@@ -69,7 +68,7 @@ Naturally, the categorical variable which states if the woman is reinfected or n
 
 Q: What is the offset(log(TimeUntilReInf))? I don't understand this to be honest ;) Can you explain?
 
-```{r variable-select, results = "hide"}
+```{r variable-select}
 #std_data$Ethnicity <- factor(std_data$Ethnicity)
 nb.model <- MASS::glm.nb(Reinfection ~ Ethnicity + MaritalStatus + Age + YearsSchool + InitInfect +
                            NumPartners +OralSex12m + OralSex30d + RectalSex12m + RectalSex30d + AbPain +
@@ -88,6 +87,12 @@ kableExtra::row_spec(k, c(6,23,24), color='white', background = 'blue')
 knitr::kable(summary(std_data))
 ```
 
+The percentage of right-censored data in the data set is given below
+
+```{r}
+dim(std_data[std_data$Reinfection == 0,])[[1]]/dim(std_data)[[1]]*100
+```
+
 
 ```{r, include=T}
 hist(std_data[, "Age"], breaks = 100)
@@ -103,8 +108,8 @@ knitr::kable(table(std_data[, "DischargeExam"]), col.names = c("Discharge at Exa
 [//]: # Pairs plot of the chosen variables. **Nothing really interested to see here perhaps?**
 
 ```{r, include=T}
-ggpairs(std_data[,continuous.variables])
-corrplot(cor(std_data[, continuous.variables]))
+ggpairs(std_data[,continuous.covar])
+corrplot(cor(std_data[, continuous.covar])) # Correlation between continuous variables. 
 ```
 Note that age and years of schooling are somewhat correlated. **Could do some more EDA probably, and should remove some of this also.** 
 
@@ -113,7 +118,7 @@ Note that age and years of schooling are somewhat correlated. **Could do some mo
 The survival curve is estimated by means of Kaplan-Meier and plotted below. The curve below shows the general survival in the data set.
 
 ```{r, echo = F}
-s1 <- with(std_data, Surv(TimeUntilReinf, cens) ~ 1)
+s1 <- with(std_data, Surv(TimeUntilReinf, Reinfection) ~ 1)
 s1fit <- survfit(s1)
 #plot(s1fit)
 
@@ -125,8 +130,8 @@ plot(s1fit, col = 2, xlab = "Time to reinfection [days]",
 title("Survival Function")
 ```
 
-```{r, include=F}
-s1.CondomUse <- with(std_data, Surv(TimeUntilReinf, cens) ~ CondomUse)
+```{r}
+s1.CondomUse <- with(std_data, Surv(TimeUntilReinf, Reinfection) ~ CondomUse)
 s1fit.CondomUse <- survfit(s1.CondomUse)
 par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
 plot(s1fit.CondomUse, col = c(1,2,3), xlab = "Time to reinfection [days]",
@@ -138,8 +143,8 @@ legend("topright", legend = levels(std_data$CondomUse), title = "Condom Use",
 title("Survival Function as Function of Condom Use")
 ```
 
-```{r, include=F}
-s1.Ethnicity <- with(std_data, Surv(TimeUntilReinf, cens) ~ Ethnicity)
+```{r}
+s1.Ethnicity <- with(std_data, Surv(TimeUntilReinf, Reinfection) ~ Ethnicity)
 s1fit.Ethnicity <- survfit(s1.Ethnicity)
 par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
 plot(s1fit.Ethnicity, col = c(1,2), xlab = "Time to reinfection [days]",
@@ -151,8 +156,8 @@ legend("topright", legend = levels(std_data$Ethnicity), title = "Ethnicity",
 title("Survival Function as Function of Ethnicity")
 ```
 
-```{r, include=F}
-s1.SignDischarge <- with(std_data, Surv(TimeUntilReinf, cens) ~ SignDischarge)
+```{r}
+s1.SignDischarge <- with(std_data, Surv(TimeUntilReinf, Reinfection) ~ SignDischarge)
 s1fit.SignDischarge <- survfit(s1.SignDischarge)
 par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
 plot(s1fit.SignDischarge, col = c(1,2), xlab = "Time to reinfection [days]",
@@ -165,8 +170,8 @@ title("Survival Function as Function of Sign of Discharge")
 ```
 
 
-```{r, include = F}
-s1.NumPartners <- with(std_data, Surv(TimeUntilReinf, cens) ~ NumPartners)
+```{r}
+s1.NumPartners <- with(std_data, Surv(TimeUntilReinf, Reinfection) ~ NumPartners)
 s1fit.NumPartners <- survfit(s1.NumPartners)
 par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
 plot(s1fit.NumPartners, col = c(1,2,3,4,5,6,7,8,9), xlab = "Time to reinfection [days]",
@@ -198,7 +203,7 @@ After trying to fit Weibull, log-logistic and lognormal log-linear models, we co
 
 ```{r, include = F}
 # Below we have the null models. 
-s2 <- with(std_data, Surv(TimeUntilReinf, cens))
+s2 <- with(std_data, Surv(TimeUntilReinf, Reinfection))
 loglo <- survreg(s2 ~ 1, dist = "loglo")  
 summary(loglo)
 weibull <- survreg(s2 ~ 1)
@@ -208,11 +213,14 @@ summary(lognormal)
 ```
 
 **The correct varliables should be inserted here after we decide on them!!**
-```{r}
+```{r fit-weibull}
+s2 <- with(std_data, Surv(TimeUntilReinf, Reinfection))
 # This should be done first with Weibull, to avoid having the log-fit here. 
-loglo.full <- survreg(s2 ~ Ethnicity + Age + NumPartners + CondomUse + YearsSchool + SignDischarge, data = std_data, dist = "loglo")
-weibull.full <- update(loglo.full, dist = "weibull")
-summary(weibull.full)
+weibull.full  <- survreg(s2 ~ Age + NumPartners + CondomUse + YearsSchool 
+                  + InitInfect + InvVagAtExam + DischargeExam, data = std_data, dist = "weibull")
+(s.weibull <- summary(weibull.full))
+#weibull.full <- survreg(s2 ~ ., data = std_data, dist = "weibull")
+#(s.weibull <- summary(weibull.full))
 
 weibull.pred <- predict(weibull.full, type = "linear")
 resids.weibull <- (log(std_data$TimeUntilReinf) - weibull.pred) / weibull.full$scale
@@ -220,7 +228,7 @@ resids.weibull <- (log(std_data$TimeUntilReinf) - weibull.pred) / weibull.full$s
 
 ```{r}
 par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
-plot(survfit(Surv(resids.weibull, std_data$cens) ~ 1), col = c(1,2,2), xlab = "Residuals",
+plot(survfit(Surv(resids.weibull, std_data$Reinfection) ~ 1), col = c(1,2,2), xlab = "Residuals",
      ylab = expression(bolditalic(hat(S)(t))),
      lty = 1, lwd = 3, yaxs = "i", xaxs = "i", bty = "n")
 title("Residuals of the Weibull Regression Model")
@@ -235,14 +243,14 @@ legend("bottomleft", c("KM estimate", "95% - CI", "Stand. Gumbel Distribution"),
 
 The residuals seem to fit relatively nicely to the Gumbel distribution, which indicates that the Weibull is reasonable to use **Check that the terminology I used here is correct!**
 
-```{r fit-lognormal, include = F}
-lognormal.full <- update(loglo.full, dist = "lognormal")
+```{r fit-lognormal}
+lognormal.full <- update(weibull.full, dist = "lognormal")
 summary(lognormal.full)
 lognormal.pred <- predict(lognormal.full, type = "linear")
 resids.logno <- (log(std_data$TimeUntilReinf) - lognormal.pred) / lognormal.full$scale
 
 par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
-plot(survfit(Surv(resids.logno, std_data$cens) ~ 1), col = c(1,2,2), xlab = "Residuals",
+plot(survfit(Surv(resids.logno, std_data$Reinfection) ~ 1), col = c(1,2,2), xlab = "Residuals",
      ylab = expression(bolditalic(hat(S)(t))),
      lty = 1, lwd = 3, yaxs = "i", xaxs = "i", bty = "n")
 title("Residuals of the Lognormal Regression Model")
@@ -252,13 +260,14 @@ legend("bottomleft", c("KM estimate", "95% - CI", "Stand. Normal Distribution"),
        col = c(1, 2, 3), lty = c(1, 2, 1), lwd = 3, bty = "n")
 ```
 
-```{r fit-loglog, include = F}
+```{r fit-loglog}
+loglo.full <- update(weibull.full, dist = "loglo")
 summary(loglo.full)
 loglo.pred <- predict(loglo.full, type = "linear")
 resids.loglo <- (log(std_data$TimeUntilReinf) - loglo.pred) / loglo.full$scale
 
 par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
-plot(survfit(Surv(resids.loglo, std_data$cens) ~ 1), col = c(1,2,2), xlab = "Residuals",
+plot(survfit(Surv(resids.loglo, std_data$Reinfection) ~ 1), col = c(1,2,2), xlab = "Residuals",
      ylab = expression(bolditalic(hat(S)(t))),
      lty = 1, lwd = 3, yaxs = "i", xaxs = "i", bty = "n")
 title("Residuals of the log-logistic Regression Model")
@@ -268,24 +277,58 @@ legend("bottomleft", c("KM estimate", "95% - CI", "Stand. Logistic Distribution"
        col = c(1, 2, 3), lty = c(1, 2, 1), lwd = 3, bty = "n")
 ```
 
-```{r cumhaz-plot, results = "hide"}
-cumhazPlot(std_data$TimeUntilReinf, std_data$cens,col = 4, distr = c("wei", "loglo", "lognormal"), font.lab = 4)
+```{r cumhaz-plot, results = "hide", fig.height=3}
+cumhazPlot(std_data$TimeUntilReinf, std_data$Reinfection,col = 4, distr = c("wei", "loglo", "lognormal"), font.lab = 4)
 ```
 
-The probability plots above also show that the Weibull is the better parametric model for the data. 
+The probability plots above also show that the Weibull is the better parametric model for the data, because the log-logistic and lognormal models clearly do not fit the line in the tails. 
 
-But how do we interpret this model fit? 
+But how do we interpret this model fit? First of all, the model we have fit has the expression
 
-The interpretation in terms of relative hazards (RHs) and the acceleration factor (AF) is ...
+$$
+Y = \ln(T) = \mu + \mathbf{\gamma}^T\mathbf{Z} + \sigma W,  
+$$
 
-Effect size measures: 
+where $W \sim EV(0,1)$, 
 
-* lognormal: acceleration factor.
-* weibull: HR.
-* log-logistic: OR.
+$$
+\mathbf{\gamma}^T = (\gamma_{Age}, \gamma_{Ethn.}, \gamma_{NumPartn.}, \gamma_{Cond.}, \gamma_{YSchool}, \gamma_{SignDisch}) 
+$$
+
+are the estimated parameters and 
+
+$$
+\mathbf{Z}^T = (Age, Ethn., NumPartn., Cond., YSchool, SignDisch), 
+$$
+
+is the vector of values. **These need to be changed according to the values used also!!** Thus, each of the quantities $\exp(\gamma_i)$s can be interpreted as the unitary change in time until reinfection (when the covariate $i$ is continuous), or the change in time until reinfection when changing level (when the covariate $i$ is categorical with different levels), when the other explanatory variables are kept fixed. **Any other interpretation of the model fit they are looking for you think?**
+
+In the Weibull model, the acceleration factor (AF) is calculated using the equation
+
+$$
+AF = \exp(-\hat{\gamma}_i)
+$$
+and the hazard ratio (HR) is calculated using the equation 
+
+$$
+HR = \exp(-\hat{\gamma}_i/\hat{\sigma}).
+$$
+In this case, the model fit gives the scale $\hat{\sigma} \approx$ `r round(s.weibull$scale, 3)`. These values are calculated for each of the covariates below. 
+
+```{r, echo = F}
+df <- data.frame("Parameter Estimate" = s.weibull$coefficients, "AF" = exp(-s.weibull$coefficients), 
+                 "HR" =  exp(-s.weibull$coefficients/s.weibull$scale))
+knitr::kable(df, caption = "Parameter Estimates, AF and HR for each Parameter Estimate")
+```
+
+Consider an example using the covariate `CondomUse` when explaining the interpretation of the covariates in terms of the AF. From the table above it is apparent that the AF of `CondomUse3` versus `CondomUse1` is $\approx$ `r round(exp(-s.weibull$coefficients)["CondomUse3"][[1]], 3)`. This means that the reinfection time for a person that never uses a condom is $\approx$ `r round(exp(-s.weibull$coefficients)["CondomUse3"][[1]], 3)` times the reinfection time for a person that always uses a condom **Not sure that this makes sense!? I think it makes sense with the coefficient value given from the model above, but does not make sense in real life, as this suggests that not using a condom is protective!** The interpretation in terms of the AF is similar when considering the other covariates, except for when considering the `Age` and `NumPartners`, which is not categorical **Perhaps it indeed makes sense to considering the Age in this way also, even though it is weird to treat the Age this way?**
+
+The relative hazards (RH) can be calculated using the equation ...
+
+**Is the relative hazards the same as the hazard ratio??**
 
 # Fit of a semi-parametric survival model
 
-The proportional hazards model is fit. 
+The proportional hazards model is fit. **This is probably done in next lab!**
 
 # Conclusions
