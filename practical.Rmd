@@ -32,7 +32,7 @@ We are given a data set on sexually transmitted diseases (STDs). This is data fr
   * CondomUse: Use of condoms (1: always, 2: once in a while, 3: never)
   * YearsSchool: Years of schooling. 
   * InitInfect: Initial infection (1: Gonorrhea, 2: Chlamydia, 3: both)
-  * InvVagAtExam: Involvement vagina at exam (1: yes; 0: no).
+  * InvVagAtExam: Involvement vagina at exam (1: yes; 0: no). 
   * DischargeExam: Discharge at exam (1: yes; 0: no)
 
 The first two were chosen based on results from a [study](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1744639/) on gonorrhea reinfection in heterosexual STD clinic attendees. The study concluded that increased reinfection risk (of gonorrhea) was associated with younger age and a greater number of recent sex partners, among other risk factors. Moreover, the authors concluded that any type of condom use was a risk factor for reinfection with gonorrhea in women. However by using statistical analysis we found that the Age of the woman and the ethnicity (a variable that was not included in the aforementioned study) are not statistically significant (Necessary to mention Ethnicity here, if it is not a part of the study?). Q: Should perhaps describe what we have done and why it has been done? I am going to ask Klaus about what he thinks about it also I think, just to see what he says. 
@@ -41,12 +41,21 @@ Another [publication](https://policylab.chop.edu/sites/default/files/pdf/publica
 
 [This meta-analysis](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2094865/) reports that the relationship between race, socioeconomic status (SES) and chlamydial infection is not clear. It concludes that SES was not associated with chlamydia infection, where they tested for several variables, where level of parent's education was one of them. Either way, we think it might be interesting to see if the years of schooling of the women have any impact on chlamydia reinfection and as is shown below it showed to be statistically significant during the exploratory analysis. Q: I also think that this would be a reason to look at race also (combined with the first study, where they only had afro-americans. Perhaps we can try to mix the variables chosen based on studies and on the statistical method? (that is; if this statistical method is something we can trust))
 
+InitInfect is interesting to use, because several of the studies above are only done on one of the two diseases, not on both at the same time. Also "almost" statistically significant, even though this is not very precise at all. 
+
 
 ```{r}
 std_data <- read.table("STD_onlydata.txt")
-colnames(std_data) <- variable.names <- c("ObsNum", "Ethnicity", "MaritalStatus", "Age", "YearsSchool", "InitInfect", "NumPartners", "OralSex12m", "OralSex30d", "RectalSex12m", "RectalSex30d", "AbPain", "SignDischarge","SignDysuria","CondomUse","SignItch","SignLesion","SignRash","SignLymph","InvVagAtExam","DischargeExam","AbnormNodeExam", "Reinfection", "TimeUntilReinf")
-
-std_data[, variable.names[-c(1, 4, 5, 7,23,24)]] <- lapply(std_data[, variable.names[-c(1,4,5,7,23,24)]],factor)
+colnames(std_data) <- variable.names <-c("ObsNum", "Ethnicity", "MaritalStatus", 
+        "Age", "YearsSchool", "InitInfect", "NumPartners", "OralSex12m", 
+        "OralSex30d", "RectalSex12m", "RectalSex30d", "AbPain", 
+        "SignDischarge","SignDysuria","CondomUse","SignItch","SignLesion",
+        "SignRash","SignLymph","InvVagAtExam","DischargeExam","AbnormNodeExam", 
+        "Reinfection", "TimeUntilReinf")
+non_factor_indices <- c(1, 4, 5, 7,23, 24) # I THINK Reinfection should be a factor as well!
+# This would mean that we should remove 23 from this list. 
+std_data[, variable.names[-non_factor_indices]] <- lapply(
+  std_data[, variable.names[-non_factor_indices]],factor)
 std_data$cens <- rep(1, length = dim(std_data)[[1]]) # All uncensored, thus cens = 1 for all rows. 
 
 variables.chosen <- c("Age", "NumPartners", "CondomUse", "Ethnicity") # ETC!
@@ -54,26 +63,25 @@ continuous.variables <- unlist(lapply(std_data, is.numeric))
 continuous.variables <- continuous.variables[-length(continuous.variables)] # Removing the cens-value. 
 ```
 
-Naturally, the categorical variable which states if the woman is reinfected or not (`Reinfection`) will be used as a dependent variable in the analysis and the time until reinfection since the more time a subject is under study, the greater the risk of the event reocurring.
-
-# Descriptive Analysis
+Naturally, the categorical variable which states if the woman is reinfected or not (`Reinfection`) will be used as a dependent variable in the analysis and the time until reinfection since the more time a subject is under study, the greater the risk of the event reoccurring.
 
 ## Variable selection 
 
-Q: What is the offset(log(TimeUntilReInf))?
+Q: What is the offset(log(TimeUntilReInf))? I don't understand this to be honest ;) Can you explain?
 
-```{r variable-select}
-std_data$Ethnicity <- factor(std_data$Ethnicity)
+```{r variable-select, results = "hide"}
+#std_data$Ethnicity <- factor(std_data$Ethnicity)
 nb.model <- MASS::glm.nb(Reinfection ~ Ethnicity + MaritalStatus + Age + YearsSchool + InitInfect +
                            NumPartners +OralSex12m + OralSex30d + RectalSex12m + RectalSex30d + AbPain +
                SignDischarge + SignDysuria+ CondomUse + SignItch + SignLesion + SignRash +
                SignLymph + InvVagAtExam + DischargeExam + AbnormNodeExam + offset(log(TimeUntilReinf)),
              data=std_data)
 s <- summary(nb.model)
-k <- knitr::kable(s$coefficients, caption = 'Variables statistical significance')
-kableExtra::row_spec(k, c(6:9,14,18,23,24), color='white', background = 'cyan')
+k <- knitr::kable(s$coefficients, caption = 'Variables Statistical Significance')
+kableExtra::row_spec(k, c(6,23,24), color='white', background = 'blue')
 ```
 
+# Descriptive Analysis
 
 ```{r, include=F}
 # Find a way to print it nicely!
@@ -81,11 +89,11 @@ knitr::kable(summary(std_data))
 ```
 
 
-```{r, include=F}
+```{r, include=T}
 hist(std_data[, "Age"], breaks = 100)
 ```
 
-```{r, include=F}
+```{r, include=T}
 knitr::kable(table(std_data[, "MaritalStatus"]), col.names = c("Marital Status", "Frequency"), caption = "Marital Status Frequency in each Level.")
 knitr::kable(table(std_data[, "SignDischarge"]), col.names = c("Sign of Discharge", "Frequency"), caption = "Sign of Discharge Frequency in each Level.")
 knitr::kable(table(std_data[, "DischargeExam"]), col.names = c("Discharge at Exam", "Frequency"), caption = "Discharge at Exam Frequency in each Level.")
@@ -94,7 +102,7 @@ knitr::kable(table(std_data[, "DischargeExam"]), col.names = c("Discharge at Exa
 
 [//]: # Pairs plot of the chosen variables. **Nothing really interested to see here perhaps?**
 
-```{r, include=F}
+```{r, include=T}
 ggpairs(std_data[,continuous.variables])
 corrplot(cor(std_data[, continuous.variables]))
 ```
@@ -102,9 +110,9 @@ Note that age and years of schooling are somewhat correlated. **Could do some mo
 
 # Nonparametric Analysis
 
-The survival curve is estimated by means of Kaplan-Meier and plotted below. The curve below shows the general survival in the data set, i.e. not depending on any specific explanatory variable. 
+The survival curve is estimated by means of Kaplan-Meier and plotted below. The curve below shows the general survival in the data set.
 
-```{r}
+```{r, echo = F}
 s1 <- with(std_data, Surv(TimeUntilReinf, cens) ~ 1)
 s1fit <- survfit(s1)
 #plot(s1fit)
@@ -117,7 +125,7 @@ plot(s1fit, col = 2, xlab = "Time to reinfection [days]",
 title("Survival Function")
 ```
 
-```{r}
+```{r, include=F}
 s1.CondomUse <- with(std_data, Surv(TimeUntilReinf, cens) ~ CondomUse)
 s1fit.CondomUse <- survfit(s1.CondomUse)
 par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
@@ -130,7 +138,7 @@ legend("topright", legend = levels(std_data$CondomUse), title = "Condom Use",
 title("Survival Function as Function of Condom Use")
 ```
 
-```{r}
+```{r, include=F}
 s1.Ethnicity <- with(std_data, Surv(TimeUntilReinf, cens) ~ Ethnicity)
 s1fit.Ethnicity <- survfit(s1.Ethnicity)
 par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
@@ -143,7 +151,7 @@ legend("topright", legend = levels(std_data$Ethnicity), title = "Ethnicity",
 title("Survival Function as Function of Ethnicity")
 ```
 
-```{r}
+```{r, include=F}
 s1.SignDischarge <- with(std_data, Surv(TimeUntilReinf, cens) ~ SignDischarge)
 s1fit.SignDischarge <- survfit(s1.SignDischarge)
 par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
@@ -157,7 +165,7 @@ title("Survival Function as Function of Sign of Discharge")
 ```
 
 
-```{r}
+```{r, include = F}
 s1.NumPartners <- with(std_data, Surv(TimeUntilReinf, cens) ~ NumPartners)
 s1fit.NumPartners <- survfit(s1.NumPartners)
 par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
@@ -171,16 +179,11 @@ title("Survival Function as Function of Number of Partners")
 ```
 
 
-The median survival time is 247 days, as can be seen below. 
+The median survival time is `r summary(s1fit)$table["median"][[1]]` days.
 
-```{r}
-s1fit
-```
+Comparison of survival functions by means of nonparametric tests, such as the logrank test. 
 
-
-Comparison of survival functions by means of nonparametric tests, such as the logrank test. The curve on ethnicity could be interesting to test (the survivals cross though!)
-
-Below, logrank test for all curves plotted above are done. 
+Below, logrank test for all curves plotted above are done. Other types of tests can also be used (Fleming-Harrington) and test can be done on different variables in the data set. 
 
 ```{r}
 FHtestrcc(s1.CondomUse)
@@ -191,11 +194,9 @@ FHtestrcc(s1.NumPartners)
 
 # Fit of a parametric survival model
 
-Fit a Weibull, log-logistic or lognormal model. Justify the theoretical choice we are taking!!
+After trying to fit Weibull, log-logistic and lognormal log-linear models, we concluded that the Weibull model is best suited to our data.
 
-```{r}
-# I am testing all three below, since I am not sure which will be better.
-
+```{r, include = F}
 # Below we have the null models. 
 s2 <- with(std_data, Surv(TimeUntilReinf, cens))
 loglo <- survreg(s2 ~ 1, dist = "loglo")  
@@ -204,48 +205,20 @@ weibull <- survreg(s2 ~ 1)
 summary(weibull)
 lognormal <- survreg(s2 ~ 1, dist = "lognormal")
 summary(lognormal)
+```
 
-# Below we add some covariates to the models. INCLUDE ALL OF THEM PERHAPS! (OR TEST WITH DIFFERENT ONES!)
-# First we add Ethnicity  e.g.
-loglo.Ethnicity <- survreg(s2 ~ Ethnicity, dist = "loglo", data = std_data)  
-summary(loglo.Ethnicity)
-weibull.Ethnicity <- survreg(s2 ~ Ethnicity, data = std_data)
-summary(weibull.Ethnicity)
-lognormal.Ethnicity <- survreg(s2 ~ Ethnicity, dist = "lognormal", data = std_data)
-summary(lognormal.Ethnicity)
-
-
+**The correct varliables should be inserted here after we decide on them!!**
+```{r}
+# This should be done first with Weibull, to avoid having the log-fit here. 
 loglo.full <- survreg(s2 ~ Ethnicity + Age + NumPartners + CondomUse + YearsSchool + SignDischarge, data = std_data, dist = "loglo")
-summary(loglo.full)
-
-loglo.pred <- predict(loglo.full, type = "linear")
-resids.loglo <- (log(std_data$TimeUntilReinf) - loglo.pred) / loglo.full$scale
-
 weibull.full <- update(loglo.full, dist = "weibull")
 summary(weibull.full)
 
 weibull.pred <- predict(weibull.full, type = "linear")
 resids.weibull <- (log(std_data$TimeUntilReinf) - weibull.pred) / weibull.full$scale
+```
 
-lognormal.full <- update(loglo.full, dist = "lognormal")
-summary(lognormal.full)
-
-lognormal.pred <- predict(lognormal.full, type = "linear")
-resids.logno <- (log(std_data$TimeUntilReinf) - lognormal.pred) / lognormal.full$scale
-
-# Model checking (using residuals etc, as done in lab 6).
-# Log-logistic
-par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
-plot(survfit(Surv(resids.loglo, std_data$cens) ~ 1), col = c(1,2,2), xlab = "Residuals",
-     ylab = expression(bolditalic(hat(S)(t))),
-     lty = 1, lwd = 3, yaxs = "i", xaxs = "i", bty = "n")
-title("Residuals of the log-logistic Regression Model")
-curve(plogis(x, lower.tail = F), from = min(resids.loglo), to = max(resids.loglo), col = 3, lwd = 3,
-      add = TRUE)
-legend("bottomleft", c("KM estimate", "95% - CI", "Stand. Logistic Distribution"),
-       col = c(1, 2, 3), lty = c(1, 2, 1), lwd = 3, bty = "n")
-
-# Weibull
+```{r}
 par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
 plot(survfit(Surv(resids.weibull, std_data$cens) ~ 1), col = c(1,2,2), xlab = "Residuals",
      ylab = expression(bolditalic(hat(S)(t))),
@@ -258,8 +231,16 @@ curve(survgumb, from = min(resids.weibull), to = max(resids.weibull), col = 3, l
       add = TRUE)
 legend("bottomleft", c("KM estimate", "95% - CI", "Stand. Gumbel Distribution"),
        col = c(1, 2, 3), lty = c(1, 2, 1), lwd = 3, bty = "n")
+```
 
-# Log-normal
+The residuals seem to fit relatively nicely to the Gumbel distribution, which indicates that the Weibull is reasonable to use **Check that the terminology I used here is correct!**
+
+```{r fit-lognormal, include = F}
+lognormal.full <- update(loglo.full, dist = "lognormal")
+summary(lognormal.full)
+lognormal.pred <- predict(lognormal.full, type = "linear")
+resids.logno <- (log(std_data$TimeUntilReinf) - lognormal.pred) / lognormal.full$scale
+
 par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
 plot(survfit(Surv(resids.logno, std_data$cens) ~ 1), col = c(1,2,2), xlab = "Residuals",
      ylab = expression(bolditalic(hat(S)(t))),
@@ -271,14 +252,31 @@ legend("bottomleft", c("KM estimate", "95% - CI", "Stand. Normal Distribution"),
        col = c(1, 2, 3), lty = c(1, 2, 1), lwd = 3, bty = "n")
 ```
 
-I would say that the Weibull looks the best based on the three residual plots that can be seen above. **But perhaps they should be tested in some other ways as well??**
+```{r fit-loglog, include = F}
+summary(loglo.full)
+loglo.pred <- predict(loglo.full, type = "linear")
+resids.loglo <- (log(std_data$TimeUntilReinf) - loglo.pred) / loglo.full$scale
 
-Goodness of fit of the parametric models is done in lab6! These things can be used to choose which of the three distributions should be used!!
+par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
+plot(survfit(Surv(resids.loglo, std_data$cens) ~ 1), col = c(1,2,2), xlab = "Residuals",
+     ylab = expression(bolditalic(hat(S)(t))),
+     lty = 1, lwd = 3, yaxs = "i", xaxs = "i", bty = "n")
+title("Residuals of the log-logistic Regression Model")
+curve(plogis(x, lower.tail = F), from = min(resids.loglo), to = max(resids.loglo), col = 3, lwd = 3,
+      add = TRUE)
+legend("bottomleft", c("KM estimate", "95% - CI", "Stand. Logistic Distribution"),
+       col = c(1, 2, 3), lty = c(1, 2, 1), lwd = 3, bty = "n")
+```
 
-```{r}
-# Does not really fit into the estimations from above! What have I done wrong?! I think I am misunderstanding something.
+```{r cumhaz-plot, results = "hide"}
 cumhazPlot(std_data$TimeUntilReinf, std_data$cens,col = 4, distr = c("wei", "loglo", "lognormal"), font.lab = 4)
 ```
+
+The probability plots above also show that the Weibull is the better parametric model for the data. 
+
+But how do we interpret this model fit? 
+
+The interpretation in terms of relative hazards (RHs) and the acceleration factor (AF) is ...
 
 Effect size measures: 
 
@@ -287,5 +285,7 @@ Effect size measures:
 * log-logistic: OR.
 
 # Fit of a semi-parametric survival model
+
+The proportional hazards model is fit. 
 
 # Conclusions
