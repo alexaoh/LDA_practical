@@ -111,9 +111,11 @@ knitr::kable(correlations, align = "c", caption = "Corr. Between Continuous Vari
 
 # Nonparametric Analysis
 
+## Survival Curve Estimation 
+
 The survival curve is estimated by means of Kaplan-Meier and plotted below. The curve below shows the general survival in the data set.
 
-```{r, echo = F}
+```{r}
 s1 <- with(std_data, Surv(TimeUntilReinf, Reinfection) ~ 1)
 s1fit <- survfit(s1)
 #plot(s1fit)
@@ -123,11 +125,19 @@ plot(s1fit, col = 2, xlab = "Time to reinfection [days]",
      ylab = expression(bolditalic(hat(S)(t))),
      lty = 1, lwd = 3, yaxs = "i", xaxs = "i", bty = "n",
      conf.int = F)
+axis(1, at = seq(0, 1600, 100))
+axis(2, at = seq(0, 1, 0.1))
 title("Survival Function")
+
+# Does it make sense to do logrank tests on the continuous variables?
+s1.CondomUse <- with(std_data, Surv(TimeUntilReinf, Reinfection) ~ CondomUse)
+s1.InitInfect <- with(std_data, Surv(TimeUntilReinf, Reinfection) ~ InitInfect)
+s1.InvVagAtExam <- with(std_data, Surv(TimeUntilReinf, Reinfection) ~ InvVagAtExam)
+s1.DischargeExam <- with(std_data, Surv(TimeUntilReinf, Reinfection) ~ DischargeExam)
 ```
 
-```{r}
-s1.CondomUse <- with(std_data, Surv(TimeUntilReinf, Reinfection) ~ CondomUse)
+```{r, include = F}
+# Plot all survival curves to make sure that we make sound conclusions! Plot the rest as well!
 s1fit.CondomUse <- survfit(s1.CondomUse)
 par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
 plot(s1fit.CondomUse, col = c(1,2,3), xlab = "Time to reinfection [days]",
@@ -139,58 +149,30 @@ legend("topright", legend = levels(std_data$CondomUse), title = "Condom Use",
 title("Survival Function as Function of Condom Use")
 ```
 
-```{r}
-s1.Ethnicity <- with(std_data, Surv(TimeUntilReinf, Reinfection) ~ Ethnicity)
-s1fit.Ethnicity <- survfit(s1.Ethnicity)
-par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
-plot(s1fit.Ethnicity, col = c(1,2), xlab = "Time to reinfection [days]",
-     ylab = expression(bolditalic(hat(S)(t))),
-     yaxs = "i", xaxs = "i", bty = "n", lty = c(1,2), lwd = rep(3, length.out = 2),
-     conf.int = F)
-legend("topright", legend = levels(std_data$Ethnicity), title = "Ethnicity",
-       bty = "n", col = c(1,2), lty = c(1,2), lwd = rep(3, length.out = 2))
-title("Survival Function as Function of Ethnicity")
-```
+The median survival time is estimated to be `r summary(s1fit)$table["median"][[1]]` days.
+
+## Comparison of Survival Curves
+ 
+Below, survival functions are compared by means of the nonparametric logrank test. Note that other types of tests also can be used (Fleming-Harrington family of tests), but we have only used the logrank test in this case. The hypothesis that is tested is 
+
+
+\begin{equation}
+        H_0: S_1(t) = S_2(t) \text{ vs. } H_1: S_1(t) \neq S_2(t),
+\end{equation}
+
+
+for different variables and their survival functions. The $p$-values from each of the tests are given in table \@ref(tab:pvalues).
 
 ```{r}
-s1.SignDischarge <- with(std_data, Surv(TimeUntilReinf, Reinfection) ~ SignDischarge)
-s1fit.SignDischarge <- survfit(s1.SignDischarge)
-par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
-plot(s1fit.SignDischarge, col = c(1,2), xlab = "Time to reinfection [days]",
-     ylab = expression(bolditalic(hat(S)(t))),
-     yaxs = "i", xaxs = "i", bty = "n", lty = c(1,2), lwd = rep(3, length.out = 2),
-     conf.int = F)
-legend("topright", legend = levels(std_data$SignDischarge), title = "Sign of Discharge",
-       bty = "n", col = c(1,2), lty = c(1,2), lwd = rep(3, length.out = 2))
-title("Survival Function as Function of Sign of Discharge")
-```
-
-
-```{r}
-s1.NumPartners <- with(std_data, Surv(TimeUntilReinf, Reinfection) ~ NumPartners)
-s1fit.NumPartners <- survfit(s1.NumPartners)
-par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
-plot(s1fit.NumPartners, col = c(1,2,3,4,5,6,7,8,9), xlab = "Time to reinfection [days]",
-     ylab = expression(bolditalic(hat(S)(t))),
-     yaxs = "i", xaxs = "i", bty = "n", lty = c(1,2,3,4,5,6,7,8,9), lwd = rep(3, length.out = 9),
-     conf.int = F)
-legend("topright", legend = levels(as.factor(std_data$NumPartners)), title = "Number of Partners",
-       bty = "n", col = c(1,2,3,4,5,6,7,8,9), lty = c(1,2,3,4,5,6,7,8,9), lwd = rep(3, length.out = 9))
-title("Survival Function as Function of Number of Partners")
-```
-
-
-The median survival time is `r summary(s1fit)$table["median"][[1]]` days.
-
-Comparison of survival functions by means of nonparametric tests, such as the logrank test. 
-
-Below, logrank test for all curves plotted above are done. Other types of tests can also be used (Fleming-Harrington) and test can be done on different variables in the data set. 
-
-```{r}
-FHtestrcc(s1.CondomUse)
-FHtestrcc(s1.Ethnicity)
-FHtestrcc(s1.SignDischarge)
-FHtestrcc(s1.NumPartners)
+# Does it make sense to do logrank tests on the continuous variables?
+cUseTest <- FHtestrcc(s1.CondomUse)
+InitTest <- FHtestrcc(s1.InitInfect)
+InvVagTest <- FHtestrcc(s1.InvVagAtExam)
+DischargeTest <- FHtestrcc(s1.DischargeExam)
+pvalues <- cbind(cUseTest$pvalue, InitTest$pvalue, InvVagTest$pvalue, DischargeTest$pvalue)
+rownames(pvalues) <- c("pvalues")
+colnames(pvalues) <- c("CondomUse", "InitInfect", "InvVagAtExam", "DischargeExam")
+knitr::kable(pvalues, align = "c", caption = "p-values from logrank tests", label = "pvalues")
 ```
 
 # Fit of a parametric survival model

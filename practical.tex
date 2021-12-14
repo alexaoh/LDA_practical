@@ -292,99 +292,38 @@ NumPartners & 0.1348591 & 0.0155090 & 1.0000000\\
 \hypertarget{nonparametric-analysis}{%
 \section{Nonparametric Analysis}\label{nonparametric-analysis}}
 
+\hypertarget{survival-curve-estimation}{%
+\subsection{Survival Curve Estimation}\label{survival-curve-estimation}}
+
 The survival curve is estimated by means of Kaplan-Meier and plotted below. The curve below shows the general survival in the data set.
 
 \includegraphics{practical_files/figure-latex/unnamed-chunk-1-1.pdf}
 
-\includegraphics{practical_files/figure-latex/unnamed-chunk-2-1.pdf}
+The median survival time is estimated to be 705 days.
 
-\includegraphics{practical_files/figure-latex/unnamed-chunk-3-1.pdf}
+\hypertarget{comparison-of-survival-curves}{%
+\subsection{Comparison of Survival Curves}\label{comparison-of-survival-curves}}
 
-\includegraphics{practical_files/figure-latex/unnamed-chunk-4-1.pdf}
+Below, survival functions are compared by means of the nonparametric logrank test. Note that other types of tests also can be used (Fleming-Harrington family of tests), but we have only used the logrank test in this case. The hypothesis that is tested is
 
-\includegraphics{practical_files/figure-latex/unnamed-chunk-5-1.pdf}
+\begin{equation}
+        H_0: S_1(t) = S_2(t) \text{ vs. } H_1: S_1(t) \neq S_2(t),
+\end{equation}
 
-The median survival time is 705 days.
+for different variables and their survival functions. The \(p\)-values from each of the tests are given in table \ref{tab:pvalues}.
 
-Comparison of survival functions by means of nonparametric tests, such as the logrank test.
+\begin{table}
 
-Below, logrank test for all curves plotted above are done. Other types of tests can also be used (Fleming-Harrington) and test can be done on different variables in the data set.
-
-\begin{verbatim}
-#> 
-#>  K-sample test for right-censored data
-#> 
-#> Parameters: rho=0, lambda=0
-#> Distribution: counting process approach
-#> 
-#> Data: Surv(TimeUntilReinf, Reinfection) by CondomUse
-#> 
-#>               N Observed Expected    O-E (O-E)^2/E (O-E)^2/V
-#> CondomUse=1  54       21     19.3   1.72     0.154     0.164
-#> CondomUse=2 511      210    185.0  24.97     3.369     7.338
-#> CondomUse=3 312      116    142.7 -26.69     4.993     8.606
-#> 
-#> Chisq= 8.6 on 2 degrees of freedom, p-value= 0.0133
-#> Alternative hypothesis: survival functions not equal
-\end{verbatim}
-
-\begin{verbatim}
-#> 
-#>  Two-sample test for right-censored data
-#> 
-#> Parameters: rho=0, lambda=0
-#> Distribution: counting process approach
-#> 
-#> Data: Surv(TimeUntilReinf, Reinfection) by Ethnicity
-#> 
-#>               N Observed Expected   O-E (O-E)^2/E (O-E)^2/V
-#> Ethnicity=B 585      264      238  25.9      2.82      9.03
-#> Ethnicity=W 292       83      109 -25.9      6.16      9.03
-#> 
-#> Statistic Z= -3, p-value= 0.00266
-#> Alternative hypothesis: survival functions not equal
-\end{verbatim}
-
-\begin{verbatim}
-#> 
-#>  Two-sample test for right-censored data
-#> 
-#> Parameters: rho=0, lambda=0
-#> Distribution: counting process approach
-#> 
-#> Data: Surv(TimeUntilReinf, Reinfection) by SignDischarge
-#> 
-#>                   N Observed Expected   O-E (O-E)^2/E (O-E)^2/V
-#> SignDischarge=0 472      171      187 -15.6      1.31      2.84
-#> SignDischarge=1 405      176      160  15.6      1.53      2.84
-#> 
-#> Statistic Z= 1.7, p-value= 0.0918
-#> Alternative hypothesis: survival functions not equal
-\end{verbatim}
-
-\begin{verbatim}
-#> 
-#>  Trend FH test for right-censored data
-#> 
-#> Parameters: rho=0, lambda=0
-#> Distribution: counting process approach
-#> 
-#> Data: Surv(TimeUntilReinf, Reinfection) by NumPartners
-#> 
-#>                  N Observed Expected     O-E
-#> NumPartners=0   70       29  27.5754   1.425
-#> NumPartners=1  607      234 244.7937 -10.794
-#> NumPartners=2  146       61  55.5667   5.433
-#> NumPartners=3   39       16  14.0435   1.957
-#> NumPartners=4    5        4   0.6262   3.374
-#> NumPartners=5    6        2   1.8913   0.109
-#> NumPartners=6    1        1   1.2190  -0.219
-#> NumPartners=10   2       29   1.1948  27.805
-#> NumPartners=19   1      234   0.0894 233.911
-#> 
-#> Statistic Z= 269, p-value= 0
-#> Alternative hypothesis: survival functions not equal
-\end{verbatim}
+\caption{\label{tab:pvalues}p-values from logrank tests}
+\centering
+\begin{tabular}[t]{l|c|c|c|c}
+\hline
+  & CondomUse & InitInfect & InvVagAtExam & DischargeExam\\
+\hline
+pvalues & 0.0132506 & 0.0145266 & 0.0068009 & 0.0558044\\
+\hline
+\end{tabular}
+\end{table}
 
 \hypertarget{fit-of-a-parametric-survival-model}{%
 \section{Fit of a parametric survival model}\label{fit-of-a-parametric-survival-model}}
@@ -421,7 +360,7 @@ After trying to fit Weibull, log-logistic and lognormal log-linear models, we co
 #> n= 877
 \end{verbatim}
 
-\includegraphics{practical_files/figure-latex/unnamed-chunk-8-1.pdf}
+\includegraphics{practical_files/figure-latex/unnamed-chunk-5-1.pdf}
 
 The residuals seem to fit relatively nicely to the Gumbel distribution, which indicates that the Weibull is reasonable to use \textbf{Check that the terminology I used here is correct!}
 
@@ -523,7 +462,7 @@ In this case, the model fit gives the scale \(\hat{\sigma} \approx\) 1.298. Thes
 
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-9}Parameter Estimates, AF and HR for each Parameter Estimate}
+\caption{\label{tab:unnamed-chunk-6}Parameter Estimates, AF and HR for each Parameter Estimate}
 \centering
 \begin{tabular}[t]{l|r|r|r}
 \hline
