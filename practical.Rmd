@@ -8,24 +8,25 @@ output:
     keep_tex: true
     toc: false
     number_sections: false
-params:
-  show_code = TRUE
+urlcolor: blue
 ---
 
 ```{r setup, include=FALSE}
-list(rm = ls())
-knitr::opts_chunk$set(echo = params$show_code, comment = "#>", eval = TRUE, warning = F, fig.height=4)
+knitr::opts_chunk$set(echo = FALSE, comment = "#>", eval = TRUE, warning = F, fig.height=4)
+rm(list = ls())
 library(tidyverse)
 library(corrplot)
 library(GGally)
 library(survival)
 library(FHtest) 
 library(GofCens)
+library(dplyr)
+library(tidyselect)
 ```
 
 # Introduction
 
-We are given a data set on sexually transmitted diseases (STDs). This is data from a study about gonorrhea and chlamydia in 877 women. The objective with this practical work is to study possible risk factors for a reinfection with gonorrhea or chlamydia in women who have suffered one of both infections previously. The variables of interest are sociodemographic variables or those related to sexual practice. We have a lot of variables at our disposal, as can be seen from the data set below. We have chosen to use the following:
+We are given a data set on sexually transmitted diseases (STDs). This is data from a study about gonorrhea and chlamydia in 877 women. The objective with this practical work is to study possible risk factors for a reinfection with gonorrhea or chlamydia in women who have suffered one of both infections previously. The variables of interest are sociodemographic variables or those related to sexual practice. We have a lot of variables at our disposal, but have chosen to use the following, some for statistical reasons and some for medical reasons:
 
   * Age: The age of the woman. 
   * NumPartners: The number of partners during the last 30 days. 
@@ -35,16 +36,16 @@ We are given a data set on sexually transmitted diseases (STDs). This is data fr
   * InvVagAtExam: Involvement vagina at exam (1: yes; 0: no). 
   * DischargeExam: Discharge at exam (1: yes; 0: no)
 
-The first two were chosen based on results from a [study](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1744639/) on gonorrhea reinfection in heterosexual STD clinic attendees. The study concluded that increased reinfection risk (of gonorrhea) was associated with younger age and a greater number of recent sex partners, among other risk factors. Moreover, the authors concluded that any type of condom use was a risk factor for reinfection with gonorrhea in women. However by using statistical analysis we found that the Age of the woman and the ethnicity (a variable that was not included in the aforementioned study) are not statistically significant (Necessary to mention Ethnicity here, if it is not a part of the study?). Q: Should perhaps describe what we have done and why it has been done? I am going to ask Klaus about what he thinks about it also I think, just to see what he says. 
+The first three were chosen based on results from a [study](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1744639/) on gonorrhea reinfection in heterosexual STD clinic attendees. The study concluded that increased reinfection risk (of gonorrhea) was associated with younger age and a greater number of recent sex partners, among other risk factors. Moreover, the authors concluded that any type of condom use was a risk factor for reinfection with gonorrhea in women. 
 
-Another [publication](https://policylab.chop.edu/sites/default/files/pdf/publications/Preventing_Chlamydia_Gonorrhea_Reinfection_through_Increased_Use_of_EPT.pdf) reports that, on average, 14\% of women with clamydia and 12\% of women with gonorrhea get reinfected, with younger women at higher risk. Moreover, they state that many adolescents treated for infection of one of the two STDs are reinfected within three to six months, usually because of resumed sexual contact with an untreated partner. Thus, the marital status might be interesting to analyse. However, this is not added, because, as seen in the exploratory data analysis below, the ages are low, which should mean that the amount in each level of `MaritalStatus` is very skewed towards single. This can be seen in the table below as well. NOT SURE IF WE SHOULD KEEP THIS, DEPENDS ON THE AMOUNT OF ROOM I GUESS. can leave it until the end. 
+Another [publication](https://policylab.chop.edu/sites/default/files/pdf/publications/Preventing_Chlamydia_Gonorrhea_Reinfection_through_Increased_Use_of_EPT.pdf) reports that, on average, 14\% of women with clamydia and 12\% of women with gonorrhea get reinfected, with younger women at higher risk. Moreover, they state that many adolescents treated for infection of one of the two STDs are reinfected within three to six months, usually because of resumed sexual contact with an untreated partner. Thus, the marital status might be interesting to analyse. However, this is not added, because, the ages in the data set are low, which most likely means that the amount in each level of `MaritalStatus` is very skewed towards "single". This can be seen in the descriptive analysis below. 
 
-[This meta-analysis](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2094865/) reports that the relationship between race, socioeconomic status (SES) and chlamydial infection is not clear. It concludes that SES was not associated with chlamydia infection, where they tested for several variables, where level of parent's education was one of them. Either way, we think it might be interesting to see if the years of schooling of the women have any impact on chlamydia reinfection and as is shown below it showed to be statistically significant during the exploratory analysis. Q: I also think that this would be a reason to look at race also (combined with the first study, where they only had afro-americans. Perhaps we can try to mix the variables chosen based on studies and on the statistical method? (that is; if this statistical method is something we can trust))
+[This meta-analysis](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2094865/) reports that the relationship between race, socioeconomic status (SES) and chlamydial infection is not clear. It concludes that SES was not associated with chlamydia infection, where they tested for several variables, where level of parent's education was one of them. Either way, we think it might be interesting to see if the years of schooling of the women (`YearsSchool`) have any impact on chlamydia reinfection and as is shown below it showed to be statistically significant during the exploratory analysis. 
 
-InitInfect is interesting to use, because several of the studies above are only done on one of the two diseases, not on both at the same time. Also "almost" statistically significant, even though this is not very precise at all. 
+Moreover, we chose to use the initial infection (`InitInfect`) as an explanatory variable, because several of the studies above are only done on one of the two diseases, not on both at the same time. Because of this we wanted to investigate if the initial infection type is a risk factor and, if this is the case, if the risk differs based on which infection was suffered initially. 
 
 
-```{r}
+```{r cleaning}
 std_data <- read.table("STD_onlydata.txt")
 colnames(std_data) <- variable.names <-c("ObsNum", "Ethnicity", "MaritalStatus", 
         "Age", "YearsSchool", "InitInfect", "NumPartners", "OralSex12m", 
@@ -60,58 +61,53 @@ covariates.chosen <- c("Age", "NumPartners", "CondomUse",
                       "YearsSchool", "InitInfect", "InvVagAtExam", "DischargeExam") # ETC!
 continuous.covar <- unlist(lapply(std_data, is.numeric)) 
 continuous.covar["Reinfection"] <- FALSE # Remove Reinfection also. 
+
+final.data <- std_data %>% dplyr::select(all_of(covariates.chosen))
 ```
 
 Naturally, the categorical variable which states if the woman is reinfected or not (`Reinfection`) will be used as a dependent variable in the analysis and the time until reinfection since the more time a subject is under study, the greater the risk of the event reoccurring.
 
-## Variable selection 
+## Statistical Variable Selection
 
-Q: What is the offset(log(TimeUntilReInf))? I don't understand this to be honest ;) Can you explain?
+As noted, in addition to medical criteria for selecting variables, we have used the following statistical model to select variables based on statistical criteria. Shown below. RODRI: EXPLAIN!
 
-```{r variable-select}
-#std_data$Ethnicity <- factor(std_data$Ethnicity)
-nb.model <- MASS::glm.nb(Reinfection ~ Ethnicity + MaritalStatus + Age + YearsSchool + InitInfect +
-                           NumPartners +OralSex12m + OralSex30d + RectalSex12m + RectalSex30d + AbPain +
-               SignDischarge + SignDysuria+ CondomUse + SignItch + SignLesion + SignRash +
-               SignLymph + InvVagAtExam + DischargeExam + AbnormNodeExam + offset(log(TimeUntilReinf)),
-             data=std_data)
+REMOVE THIS AFTER: I made a list of things that can be used in the explanation:
+* Despite the fact that the age of the woman is found to not be statistically significant in the method above, we have added it because of the mentioned studies (this is thus added based on medical criteria)
+
+```{r variable-select, echo = T}
+nb.model <- MASS::glm.nb(Reinfection ~ Ethnicity + MaritalStatus + Age + YearsSchool 
+          + InitInfect + NumPartners +OralSex12m + OralSex30d + RectalSex12m 
+          + RectalSex30d + AbPain + SignDischarge + SignDysuria + CondomUse 
+          + SignItch + SignLesion + SignRash + SignLymph + InvVagAtExam 
+          + DischargeExam + AbnormNodeExam + offset(log(TimeUntilReinf)),
+              data=std_data)
 s <- summary(nb.model)
-k <- knitr::kable(s$coefficients, caption = 'Variables Statistical Significance')
+k <- knitr::kable(s$coefficients, caption = 'Statistical Significance of the Variables')
 kableExtra::row_spec(k, c(6,23,24), color='white', background = 'blue')
 ```
 
+Finally, the vaginal involvement at exam (`InvVagAtExam`) and the discharge at exam (`DischargeExam`) are selected as variables in our analysis, since they are shown as statistically significant in the variable selection above. 
+
 # Descriptive Analysis
 
-```{r, include=F}
-# Find a way to print it nicely!
-knitr::kable(summary(std_data))
+In total, the data set contains `r dim(std_data)[[2]]` variables, but, as noted, we have selected only 7 of them in our analysis. Recall that the data set has `r dim(std_data)[[1]]` women. The percentage of right-censored data in the data set is `r round( dim(std_data[std_data$Reinfection == 0,])[[1]]/dim(std_data)[[1]]*100, 1)`, which is a relatively large part of the data set. The women where followed for `r max(std_data$TimeUntilReinf)` days, then the study was stopped. 
+
+```{r EDA-plots, fig.height=5.5}
+par(mfrow = c(3,3))
+hist(final.data[, "Age"], breaks = 100, main= "Age", xlab = "Age")
+hist(final.data[, "YearsSchool"], breaks = 100, main = "YearsSchool", xlab = "YearsSchool")
+hist(final.data[, "NumPartners"], breaks = 100, main = "NumPartners", xlab = "NumPartners")
+barplot(height = table(final.data %>% dplyr::select(CondomUse)), main = "Counts of CondomUse")
+barplot(height = table(final.data %>% dplyr::select(InitInfect)), main = "Counts of InitInfect")
+barplot(height = table(final.data %>% dplyr::select(InvVagAtExam)), main = "Counts of InvVagAtExam")
+barplot(height = table(final.data %>% dplyr::select(DischargeExam)), main = "Counts of DischargeExam")
 ```
+The three continuous variables we have chosen to use in the analysis are `Age`, `YearsSchool` and `NumPartners`. The correlations between the variables are shown in table \@ref(tab:correlations). Note that the correlation between `Age` and `YearsSchool` is `r round(cor(std_data$Age, std_data$YearsSchool), 2)`, which means that they are somewhat correlated. This could be interesting to have in mind in the following. 
 
-The percentage of right-censored data in the data set is given below
-
-```{r}
-dim(std_data[std_data$Reinfection == 0,])[[1]]/dim(std_data)[[1]]*100
+```{r correlations}
+correlations <- cor(final.data %>% dplyr::select(Age, YearsSchool, NumPartners))
+knitr::kable(correlations, align = "c", caption = "Corr. Between Continuous Variables", label = "correlations")
 ```
-
-
-```{r, include=T}
-hist(std_data[, "Age"], breaks = 100)
-```
-
-```{r, include=T}
-knitr::kable(table(std_data[, "MaritalStatus"]), col.names = c("Marital Status", "Frequency"), caption = "Marital Status Frequency in each Level.")
-knitr::kable(table(std_data[, "SignDischarge"]), col.names = c("Sign of Discharge", "Frequency"), caption = "Sign of Discharge Frequency in each Level.")
-knitr::kable(table(std_data[, "DischargeExam"]), col.names = c("Discharge at Exam", "Frequency"), caption = "Discharge at Exam Frequency in each Level.")
-# Some more tables?
-```
-
-[//]: # Pairs plot of the chosen variables. **Nothing really interested to see here perhaps?**
-
-```{r, include=T}
-ggpairs(std_data[,continuous.covar])
-corrplot(cor(std_data[, continuous.covar])) # Correlation between continuous variables. 
-```
-Note that age and years of schooling are somewhat correlated. **Could do some more EDA probably, and should remove some of this also.** 
 
 # Nonparametric Analysis
 
