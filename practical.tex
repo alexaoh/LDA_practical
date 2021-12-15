@@ -141,7 +141,7 @@
 \makeatother
 \subtitle{Lifetime Data Analysis}
 \author{Rodrigo Arriaza, Alexander J Ohrt}
-\date{14 desember, 2021}
+\date{15 desember, 2021}
 
 \begin{document}
 \maketitle
@@ -185,7 +185,12 @@ Naturally, the categorical variable which states if the woman is reinfected or n
 As noted, in addition to medical criteria for selecting variables, we have used the following statistical model to select variables based on statistical criteria. Shown below. RODRI: EXPLAIN!
 
 REMOVE THIS AFTER: I made a list of things that can be used in the explanation:
-* Despite the fact that the age of the woman is found to not be statistically significant in the method above, we have added it because of the mentioned studies (this is thus added based on medical criteria)
+
+\begin{itemize}
+\tightlist
+\item
+  Despite the fact that the age of the woman is found to not be statistically significant in the method above, we have added it because of the mentioned studies (this is thus added based on medical criteria)
+\end{itemize}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -304,13 +309,13 @@ The median survival time is estimated to be 705 days.
 \hypertarget{comparison-of-survival-curves}{%
 \subsection{Comparison of Survival Curves}\label{comparison-of-survival-curves}}
 
-Below, survival functions are compared by means of the nonparametric logrank test. Note that other types of tests also can be used (Fleming-Harrington family of tests), but we have only used the logrank test in this case. The hypothesis that is tested is
+Below, survival functions are compared by means of the nonparametric logrank test. Note that other types of tests also can be used (Fleming-Harrington family of tests), but we have only used the logrank test in this case. The general \(k\)-sample hypothesis that is tested is
 
-\begin{equation}
-        H_0: S_1(t) = S_2(t) \text{ vs. } H_1: S_1(t) \neq S_2(t),
-\end{equation}
+\begin{equation*}
+        H_0: S_1(t) = \ldots = S_k(t), \forall t \leq \tau \text{ vs. } H_1: \text{ some } S_i(t) \neq S_l(t), \text{ for some } t \leq \tau,
+\end{equation*}
 
-for different variables and their survival functions. The \(p\)-values from each of the tests are given in table \ref{tab:pvalues}.
+where \(\tau\) is the chosen limit of the time of examination and \(k\) varies depending on the levels of the explanatory variable we are testing. \textbf{What about tests on continuous variables, does this make sense as well?} The \(p\)-values from each of the tests are given in table \ref{tab:pvalues}. For instance, choosing a significance level of \(\alpha = 0.05\), we would conclude that reinfection depends on the level of \texttt{CondomUse}, \texttt{InitInfect} and \texttt{InvVagAtExam}, but that there is not enough evidence to conclude that reinfection depends on the level of \texttt{DischargeExam}.
 
 \begin{table}
 
@@ -320,7 +325,7 @@ for different variables and their survival functions. The \(p\)-values from each
 \hline
   & CondomUse & InitInfect & InvVagAtExam & DischargeExam\\
 \hline
-pvalues & 0.0132506 & 0.0145266 & 0.0068009 & 0.0558044\\
+p-values & 0.0132506 & 0.0145266 & 0.0068009 & 0.0558044\\
 \hline
 \end{tabular}
 \end{table}
@@ -329,15 +334,12 @@ pvalues & 0.0132506 & 0.0145266 & 0.0068009 & 0.0558044\\
 \section{Fit of a parametric survival model}\label{fit-of-a-parametric-survival-model}}
 
 After trying to fit Weibull, log-logistic and lognormal log-linear models, we concluded that the Weibull model is best suited to our data.
-
-\textbf{The correct varliables should be inserted here after we decide on them!!}
+\textbf{Should we have some interaction terms as well?}
 
 \begin{verbatim}
 #> 
 #> Call:
-#> survreg(formula = s2 ~ Age + NumPartners + CondomUse + YearsSchool + 
-#>     InitInfect + InvVagAtExam + DischargeExam, data = std_data, 
-#>     dist = "weibull")
+#> survreg(formula = s2 ~ ., data = final.data, dist = "weibull")
 #>                  Value Std. Error     z       p
 #> (Intercept)     3.9516     0.6338  6.23 4.5e-10
 #> Age             0.0101     0.0161  0.63 0.52912
@@ -360,75 +362,15 @@ After trying to fit Weibull, log-logistic and lognormal log-linear models, we co
 #> n= 877
 \end{verbatim}
 
-\includegraphics{practical_files/figure-latex/unnamed-chunk-5-1.pdf}
+\includegraphics{practical_files/figure-latex/weibull-resids-1.pdf}
 
-The residuals seem to fit relatively nicely to the Gumbel distribution, which indicates that the Weibull is reasonable to use \textbf{Check that the terminology I used here is correct!}
-
-\begin{verbatim}
-#> 
-#> Call:
-#> survreg(formula = s2 ~ Age + NumPartners + CondomUse + YearsSchool + 
-#>     InitInfect + InvVagAtExam + DischargeExam, data = std_data, 
-#>     dist = "lognormal")
-#>                    Value Std. Error     z       p
-#> (Intercept)     2.881331   0.776808  3.71 0.00021
-#> Age            -0.000895   0.018939 -0.05 0.96232
-#> NumPartners    -0.019853   0.077571 -0.26 0.79800
-#> CondomUse2      0.411402   0.360931  1.14 0.25435
-#> CondomUse3      0.811166   0.375119  2.16 0.03059
-#> YearsSchool     0.204027   0.057861  3.53 0.00042
-#> InitInfect2     0.373146   0.242880  1.54 0.12446
-#> InitInfect3     0.318740   0.249560  1.28 0.20153
-#> InvVagAtExam1  -0.777588   0.270837 -2.87 0.00409
-#> DischargeExam1  0.725573   0.365444  1.99 0.04709
-#> Log(scale)      0.724527   0.039725 18.24 < 2e-16
-#> 
-#> Scale= 2.06 
-#> 
-#> Log Normal distribution
-#> Loglik(model)= -2688.6   Loglik(intercept only)= -2709.4
-#>  Chisq= 41.51 on 9 degrees of freedom, p= 4e-06 
-#> Number of Newton-Raphson Iterations: 4 
-#> n= 877
-\end{verbatim}
-
-\includegraphics{practical_files/figure-latex/fit-lognormal-1.pdf}
-
-\begin{verbatim}
-#> 
-#> Call:
-#> survreg(formula = s2 ~ Age + NumPartners + CondomUse + YearsSchool + 
-#>     InitInfect + InvVagAtExam + DischargeExam, data = std_data, 
-#>     dist = "loglo")
-#>                   Value Std. Error     z       p
-#> (Intercept)     3.26979    0.72210  4.53 5.9e-06
-#> Age             0.00152    0.01777  0.09 0.93188
-#> NumPartners    -0.05643    0.07503 -0.75 0.45201
-#> CondomUse2      0.26490    0.35206  0.75 0.45179
-#> CondomUse3      0.63442    0.36424  1.74 0.08156
-#> YearsSchool     0.19049    0.05365  3.55 0.00038
-#> InitInfect2     0.42277    0.21873  1.93 0.05326
-#> InitInfect3     0.32407    0.22067  1.47 0.14194
-#> InvVagAtExam1  -0.70568    0.25677 -2.75 0.00599
-#> DischargeExam1  0.54808    0.34697  1.58 0.11420
-#> Log(scale)      0.09847    0.04479  2.20 0.02791
-#> 
-#> Scale= 1.1 
-#> 
-#> Log logistic distribution
-#> Loglik(model)= -2680.2   Loglik(intercept only)= -2701.5
-#>  Chisq= 42.58 on 9 degrees of freedom, p= 2.6e-06 
-#> Number of Newton-Raphson Iterations: 4 
-#> n= 877
-\end{verbatim}
-
-\includegraphics{practical_files/figure-latex/fit-loglog-1.pdf}
+The standard Gumbel distribution seems to fit relatively nicely to the Kaplan-Meier estimate of the residuals, i.e.~it seems like a reasonable choice for the error term \(W\), which indicates that the Weibull is a reasonable model.
 
 \includegraphics{practical_files/figure-latex/cumhaz-plot-1.pdf}
 
 The probability plots above also show that the Weibull is the better parametric model for the data, because the log-logistic and lognormal models clearly do not fit the line in the tails.
 
-But how do we interpret this model fit? First of all, the model we have fit has the expression
+How do we interpret this model fit? First of all, the model we have fit follows the expression
 
 \[
 Y = \ln(T) = \mu + \mathbf{\gamma}^T\mathbf{Z} + \sigma W,  
@@ -437,16 +379,16 @@ Y = \ln(T) = \mu + \mathbf{\gamma}^T\mathbf{Z} + \sigma W,
 where \(W \sim EV(0,1)\),
 
 \[
-\mathbf{\gamma}^T = (\gamma_{Age}, \gamma_{Ethn.}, \gamma_{NumPartn.}, \gamma_{Cond.}, \gamma_{YSchool}, \gamma_{SignDisch}) 
+\mathbf{\gamma}^T = (\gamma_{Age}, \gamma_{NumPartn.}, \gamma_{Cond.}, \gamma_{YSchool}, \gamma_{InitInf.}, \gamma_{InvVagAtExam.}, \gamma_{DischargeAtExam}),
 \]
 
 are the estimated parameters and
 
 \[
-\mathbf{Z}^T = (Age, Ethn., NumPartn., Cond., YSchool, SignDisch), 
+\mathbf{Z}^T = (Age, NumPartn., Cond., YSchool, InitInf., InvVagAtExam., DischargeAtExam), 
 \]
 
-is the vector of values. \textbf{These need to be changed according to the values used also!!} Thus, each of the quantities \(\exp(\gamma_i)\)s can be interpreted as the unitary change in time until reinfection (when the covariate \(i\) is continuous), or the change in time until reinfection when changing level (when the covariate \(i\) is categorical with different levels), when the other explanatory variables are kept fixed. \textbf{Any other interpretation of the model fit they are looking for you think?}
+is the vector of values. Thus, each of the quantities \(\exp(\gamma_i)\) can be interpreted as the unitary change in time until reinfection (when the covariate \(i\) is continuous), or the change in time until reinfection when changing level (when the covariate \(i\) is categorical with different levels), when all the other explanatory variables are kept fixed.
 
 In the Weibull model, the acceleration factor (AF) is calculated using the equation
 
@@ -462,7 +404,7 @@ In this case, the model fit gives the scale \(\hat{\sigma} \approx\) 1.298. Thes
 
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-6}Parameter Estimates, AF and HR for each Parameter Estimate}
+\caption{\label{tab:unnamed-chunk-4}Parameter Estimates, AF and HR for each Parameter Estimate}
 \centering
 \begin{tabular}[t]{l|r|r|r}
 \hline
@@ -500,9 +442,55 @@ The relative hazards (RH) can be calculated using the equation \ldots{}
 \hypertarget{fit-of-a-semi-parametric-survival-model}{%
 \section{Fit of a semi-parametric survival model}\label{fit-of-a-semi-parametric-survival-model}}
 
-The proportional hazards model is fit. \textbf{This is probably done in next lab!}
+The proportional hazards model is below.
+
+\begin{verbatim}
+#> Call:
+#> coxph(formula = s2 ~ ., data = final.data)
+#> 
+#>   n= 877, number of events= 347 
+#> 
+#>                     coef exp(coef)  se(coef)      z Pr(>|z|)    
+#> Age            -0.007831  0.992200  0.012379 -0.633 0.526992    
+#> NumPartners     0.011195  1.011258  0.052483  0.213 0.831083    
+#> CondomUse2     -0.055195  0.946300  0.231217 -0.239 0.811326    
+#> CondomUse3     -0.335706  0.714833  0.239486 -1.402 0.160981    
+#> YearsSchool    -0.133564  0.874972  0.037403 -3.571 0.000356 ***
+#> InitInfect2    -0.386802  0.679225  0.146484 -2.641 0.008277 ** 
+#> InitInfect3    -0.235005  0.790567  0.147682 -1.591 0.111545    
+#> InvVagAtExam1   0.401916  1.494686  0.170481  2.358 0.018396 *  
+#> DischargeExam1 -0.367438  0.692506  0.223246 -1.646 0.099786 .  
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#>                exp(coef) exp(-coef) lower .95 upper .95
+#> Age               0.9922     1.0079    0.9684    1.0166
+#> NumPartners       1.0113     0.9889    0.9124    1.1208
+#> CondomUse2        0.9463     1.0567    0.6015    1.4888
+#> CondomUse3        0.7148     1.3989    0.4470    1.1430
+#> YearsSchool       0.8750     1.1429    0.8131    0.9415
+#> InitInfect2       0.6792     1.4723    0.5097    0.9051
+#> InitInfect3       0.7906     1.2649    0.5919    1.0560
+#> InvVagAtExam1     1.4947     0.6690    1.0701    2.0877
+#> DischargeExam1    0.6925     1.4440    0.4471    1.0726
+#> 
+#> Concordance= 0.602  (se = 0.017 )
+#> Likelihood ratio test= 45.8  on 9 df,   p=7e-07
+#> Wald test            = 46.94  on 9 df,   p=4e-07
+#> Score (logrank) test = 47.21  on 9 df,   p=4e-07
+\end{verbatim}
+
+How do we interpret this model fit? First of all, the model we have fit follows the expression
+
+\[
+\lambda(t|\mathbf{Z}) =  \exp(\mathbf{\gamma}^T\mathbf{Z})\lambda_0(t),  
+\]
+
+where \(\gamma\) are the parameters in the model and \(\mathbf{Z}\) is the profile of the woman. Additionally, \(\lambda_0(t)\) is the hazard at time \(t\) for a woman with profile \(\mathbf{Z} = 0\), i.e.~a woman that always uses a condom, that was initially infected with (only) gonnorhea, that did not experience vaginal involvement at exam and did not experience discharge at exam. \textbf{Again: What do we do with the continuous covariates?}
 
 \hypertarget{conclusions}{%
 \section{Conclusions}\label{conclusions}}
+
+Conclude on if some of the chosen explanatory variables are risk factors or protective factors for reinfection.
 
 \end{document}

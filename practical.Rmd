@@ -72,6 +72,7 @@ Naturally, the categorical variable which states if the woman is reinfected or n
 As noted, in addition to medical criteria for selecting variables, we have used the following statistical model to select variables based on statistical criteria. Shown below. RODRI: EXPLAIN!
 
 REMOVE THIS AFTER: I made a list of things that can be used in the explanation:
+
 * Despite the fact that the age of the woman is found to not be statistically significant in the method above, we have added it because of the mentioned studies (this is thus added based on medical criteria)
 
 ```{r variable-select, echo = T}
@@ -153,15 +154,13 @@ The median survival time is estimated to be `r summary(s1fit)$table["median"][[1
 
 ## Comparison of Survival Curves
  
-Below, survival functions are compared by means of the nonparametric logrank test. Note that other types of tests also can be used (Fleming-Harrington family of tests), but we have only used the logrank test in this case. The hypothesis that is tested is 
+Below, survival functions are compared by means of the nonparametric logrank test. Note that other types of tests also can be used (Fleming-Harrington family of tests), but we have only used the logrank test in this case. The general $k$-sample hypothesis that is tested is 
 
+\begin{equation*}
+        H_0: S_1(t) = \ldots = S_k(t), \forall t \leq \tau \text{ vs. } H_1: \text{ some } S_i(t) \neq S_l(t), \text{ for some } t \leq \tau,
+\end{equation*}
 
-\begin{equation}
-        H_0: S_1(t) = S_2(t) \text{ vs. } H_1: S_1(t) \neq S_2(t),
-\end{equation}
-
-
-for different variables and their survival functions. The $p$-values from each of the tests are given in table \@ref(tab:pvalues).
+where $\tau$ is the chosen limit of the time of examination and $k$ varies depending on the levels of the explanatory variable we are testing. **What about tests on continuous variables, does this make sense as well?** The $p$-values from each of the tests are given in table \@ref(tab:pvalues). For instance, choosing a significance level of $\alpha = 0.05$, we would conclude that reinfection depends on the level of `CondomUse`, `InitInfect` and `InvVagAtExam`, but that there is not enough evidence to conclude that reinfection depends on the level of `DischargeExam`.
 
 ```{r}
 # Does it make sense to do logrank tests on the continuous variables?
@@ -170,7 +169,7 @@ InitTest <- FHtestrcc(s1.InitInfect)
 InvVagTest <- FHtestrcc(s1.InvVagAtExam)
 DischargeTest <- FHtestrcc(s1.DischargeExam)
 pvalues <- cbind(cUseTest$pvalue, InitTest$pvalue, InvVagTest$pvalue, DischargeTest$pvalue)
-rownames(pvalues) <- c("pvalues")
+rownames(pvalues) <- c("p-values")
 colnames(pvalues) <- c("CondomUse", "InitInfect", "InvVagAtExam", "DischargeExam")
 knitr::kable(pvalues, align = "c", caption = "p-values from logrank tests", label = "pvalues")
 ```
@@ -178,33 +177,17 @@ knitr::kable(pvalues, align = "c", caption = "p-values from logrank tests", labe
 # Fit of a parametric survival model
 
 After trying to fit Weibull, log-logistic and lognormal log-linear models, we concluded that the Weibull model is best suited to our data.
+**Should we have some interaction terms as well?**
 
-```{r, include = F}
-# Below we have the null models. 
-s2 <- with(std_data, Surv(TimeUntilReinf, Reinfection))
-loglo <- survreg(s2 ~ 1, dist = "loglo")  
-summary(loglo)
-weibull <- survreg(s2 ~ 1)
-summary(weibull)
-lognormal <- survreg(s2 ~ 1, dist = "lognormal")
-summary(lognormal)
-```
-
-**The correct varliables should be inserted here after we decide on them!!**
 ```{r fit-weibull}
 s2 <- with(std_data, Surv(TimeUntilReinf, Reinfection))
-# This should be done first with Weibull, to avoid having the log-fit here. 
-weibull.full  <- survreg(s2 ~ Age + NumPartners + CondomUse + YearsSchool 
-                  + InitInfect + InvVagAtExam + DischargeExam, data = std_data, dist = "weibull")
+weibull.full  <- survreg(s2 ~ ., data = final.data, dist = "weibull")
 (s.weibull <- summary(weibull.full))
-#weibull.full <- survreg(s2 ~ ., data = std_data, dist = "weibull")
-#(s.weibull <- summary(weibull.full))
-
-weibull.pred <- predict(weibull.full, type = "linear")
-resids.weibull <- (log(std_data$TimeUntilReinf) - weibull.pred) / weibull.full$scale
 ```
 
-```{r}
+```{r weibull-resids}
+weibull.pred <- predict(weibull.full, type = "linear")
+resids.weibull <- (log(std_data$TimeUntilReinf) - weibull.pred) / weibull.full$scale
 par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
 plot(survfit(Surv(resids.weibull, std_data$Reinfection) ~ 1), col = c(1,2,2), xlab = "Residuals",
      ylab = expression(bolditalic(hat(S)(t))),
@@ -219,9 +202,9 @@ legend("bottomleft", c("KM estimate", "95% - CI", "Stand. Gumbel Distribution"),
        col = c(1, 2, 3), lty = c(1, 2, 1), lwd = 3, bty = "n")
 ```
 
-The residuals seem to fit relatively nicely to the Gumbel distribution, which indicates that the Weibull is reasonable to use **Check that the terminology I used here is correct!**
+The standard Gumbel distribution seems to fit relatively nicely to the Kaplan-Meier estimate of the residuals, i.e. it seems like a reasonable choice for the error term $W$, which indicates that the Weibull is a reasonable model. 
 
-```{r fit-lognormal}
+```{r fit-lognormal, include= F}
 lognormal.full <- update(weibull.full, dist = "lognormal")
 summary(lognormal.full)
 lognormal.pred <- predict(lognormal.full, type = "linear")
@@ -238,7 +221,7 @@ legend("bottomleft", c("KM estimate", "95% - CI", "Stand. Normal Distribution"),
        col = c(1, 2, 3), lty = c(1, 2, 1), lwd = 3, bty = "n")
 ```
 
-```{r fit-loglog}
+```{r fit-loglog, include = F}
 loglo.full <- update(weibull.full, dist = "loglo")
 summary(loglo.full)
 loglo.pred <- predict(loglo.full, type = "linear")
@@ -261,7 +244,7 @@ cumhazPlot(std_data$TimeUntilReinf, std_data$Reinfection,col = 4, distr = c("wei
 
 The probability plots above also show that the Weibull is the better parametric model for the data, because the log-logistic and lognormal models clearly do not fit the line in the tails. 
 
-But how do we interpret this model fit? First of all, the model we have fit has the expression
+How do we interpret this model fit? First of all, the model we have fit follows the expression
 
 $$
 Y = \ln(T) = \mu + \mathbf{\gamma}^T\mathbf{Z} + \sigma W,  
@@ -270,16 +253,16 @@ $$
 where $W \sim EV(0,1)$, 
 
 $$
-\mathbf{\gamma}^T = (\gamma_{Age}, \gamma_{Ethn.}, \gamma_{NumPartn.}, \gamma_{Cond.}, \gamma_{YSchool}, \gamma_{SignDisch}) 
+\mathbf{\gamma}^T = (\gamma_{Age}, \gamma_{NumPartn.}, \gamma_{Cond.}, \gamma_{YSchool}, \gamma_{InitInf.}, \gamma_{InvVagAtExam.}, \gamma_{DischargeAtExam}),
 $$
 
 are the estimated parameters and 
 
 $$
-\mathbf{Z}^T = (Age, Ethn., NumPartn., Cond., YSchool, SignDisch), 
+\mathbf{Z}^T = (Age, NumPartn., Cond., YSchool, InitInf., InvVagAtExam., DischargeAtExam), 
 $$
 
-is the vector of values. **These need to be changed according to the values used also!!** Thus, each of the quantities $\exp(\gamma_i)$s can be interpreted as the unitary change in time until reinfection (when the covariate $i$ is continuous), or the change in time until reinfection when changing level (when the covariate $i$ is categorical with different levels), when the other explanatory variables are kept fixed. **Any other interpretation of the model fit they are looking for you think?**
+is the vector of values. Thus, each of the quantities $\exp(\gamma_i)$ can be interpreted as the unitary change in time until reinfection (when the covariate $i$ is continuous), or the change in time until reinfection when changing level (when the covariate $i$ is categorical with different levels), when all the other explanatory variables are kept fixed. 
 
 In the Weibull model, the acceleration factor (AF) is calculated using the equation
 
@@ -307,6 +290,25 @@ The relative hazards (RH) can be calculated using the equation ...
 
 # Fit of a semi-parametric survival model
 
-The proportional hazards model is fit. **This is probably done in next lab!**
+The proportional hazards model is below. 
+
+```{r Cox-model}
+cox1 <- coxph(s2 ~ ., data = final.data)
+(s1.cox1 <- summary(cox1))
+```
+
+How do we interpret this model fit? First of all, the model we have fit follows the expression
+
+$$
+\lambda(t|\mathbf{Z}) =  \exp(\mathbf{\gamma}^T\mathbf{Z})\lambda_0(t),  
+$$
+
+where $\gamma$ are the parameters in the model and $\mathbf{Z}$ is the profile of the woman. Additionally, $\lambda_0(t)$ is the hazard at time $t$ for a woman with profile $\mathbf{Z} = 0$, i.e. a woman that always uses a condom, that was initially infected with (only) gonnorhea, that did not experience vaginal involvement at exam and did not experience discharge at exam. **Again: What do we do with the continuous covariates?** 
+
+The model parameters $\gamma$ can be interpreted in terms of relative hazards. 
+
+Analysis of residuals is done in the last lab, tuesday 21.12.21.
 
 # Conclusions
+
+Conclude on if some of the chosen explanatory variables are risk factors or protective factors for reinfection.
