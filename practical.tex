@@ -141,7 +141,7 @@
 \makeatother
 \subtitle{Lifetime Data Analysis}
 \author{Rodrigo Arriaza, Alexander J Ohrt}
-\date{15 desember, 2021}
+\date{20 desember, 2021}
 
 \begin{document}
 \maketitle
@@ -334,7 +334,7 @@ p-values & 0.0132506 & 0.0145266 & 0.0068009 & 0.0558044\\
 \section{Fit of a parametric survival model}\label{fit-of-a-parametric-survival-model}}
 
 After trying to fit Weibull, log-logistic and lognormal log-linear models, we concluded that the Weibull model is best suited to our data.
-\textbf{Should we have some interaction terms as well?}
+\textbf{Should we have some interaction terms as well? Could be interesting! There are some significant interactions in both parametric and semi-parametric models, so this could be interesting I think! Then the interpretations need to be explained further also (the interaction terms are explained a bit differently).}
 
 \begin{verbatim}
 #> 
@@ -388,7 +388,7 @@ are the estimated parameters and
 \mathbf{Z}^T = (Age, NumPartn., Cond., YSchool, InitInf., InvVagAtExam., DischargeAtExam), 
 \]
 
-is the vector of values. Thus, each of the quantities \(\exp(\gamma_i)\) can be interpreted as the unitary change in time until reinfection (when the covariate \(i\) is continuous), or the change in time until reinfection when changing level (when the covariate \(i\) is categorical with different levels), when all the other explanatory variables are kept fixed.
+is the vector of values. Thus, each of the quantities \(\exp(\gamma_i)\) can be interpreted as the unitary change in time until reinfection (when covariate \(i\) is continuous), or the change in time until reinfection when changing level (when the covariate \(i\) is categorical with different levels), when all the other explanatory variables are kept fixed. This means that a positive parameter estimate \(\hat{\gamma}_i\) gives \(\exp(\gamma_i) > 0\), which means that the covariate is estimated to being protective by the model, since it increases \(\ln(T)\). The oppositve holds for \(\hat{\gamma}_i < 0\). These interpretations will be done with the acceleration factor and relative hazard next.
 
 In the Weibull model, the acceleration factor (AF) is calculated using the equation
 
@@ -435,58 +435,41 @@ DischargeExam1 & 0.4601294 & 0.6312020 & 0.7014676\\
 
 Consider an example using the covariate \texttt{CondomUse} when explaining the interpretation of the covariates in terms of the AF. From the table above it is apparent that the AF of \texttt{CondomUse3} versus \texttt{CondomUse1} is \(\approx\) 0.655. This means that the reinfection time for a person that never uses a condom is \(\approx\) 0.655 times the reinfection time for a person that always uses a condom \textbf{Not sure that this makes sense!? I think it makes sense with the coefficient value given from the model above, but does not make sense in real life, as this suggests that not using a condom is protective!} The interpretation in terms of the AF is similar when considering the other covariates, except for when considering the \texttt{Age} and \texttt{NumPartners}, which is not categorical \textbf{Perhaps it indeed makes sense to considering the Age in this way also, even though it is weird to treat the Age this way?}
 
-The relative hazards (RH) can be calculated using the equation \ldots{}
+\textbf{Here I have assumed that the relative hazards is the same as the hazard ratio?? IS THIS CORRECT?! I think so! Looks like the values make sense with the results from the Cox-model below!}
 
-\textbf{Is the relative hazards the same as the hazard ratio??}
+Similarly, an example can be used to explain the interpretation of the covariates in terms of the relative hazard. From the table it is apparent that the hazard of \texttt{CondomUse3} relative to \texttt{CondomUse1} is \(\approx\) 0.722. This means that the instantaneous risk of reinfection for a person that never uses a condom is \(\approx\) 0.722 times the instantaneous risk of a person that always uses a condom. Similar interpretations can be done with the other covariates.
 
 \hypertarget{fit-of-a-semi-parametric-survival-model}{%
 \section{Fit of a semi-parametric survival model}\label{fit-of-a-semi-parametric-survival-model}}
 
-The proportional hazards model is below.
+The proportional hazards model is fit below.
 
 \begin{verbatim}
-#> Call:
-#> coxph(formula = s2 ~ ., data = final.data)
-#> 
-#>   n= 877, number of events= 347 
-#> 
-#>                     coef exp(coef)  se(coef)      z Pr(>|z|)    
-#> Age            -0.007831  0.992200  0.012379 -0.633 0.526992    
-#> NumPartners     0.011195  1.011258  0.052483  0.213 0.831083    
-#> CondomUse2     -0.055195  0.946300  0.231217 -0.239 0.811326    
-#> CondomUse3     -0.335706  0.714833  0.239486 -1.402 0.160981    
-#> YearsSchool    -0.133564  0.874972  0.037403 -3.571 0.000356 ***
-#> InitInfect2    -0.386802  0.679225  0.146484 -2.641 0.008277 ** 
-#> InitInfect3    -0.235005  0.790567  0.147682 -1.591 0.111545    
-#> InvVagAtExam1   0.401916  1.494686  0.170481  2.358 0.018396 *  
-#> DischargeExam1 -0.367438  0.692506  0.223246 -1.646 0.099786 .  
-#> ---
-#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-#> 
-#>                exp(coef) exp(-coef) lower .95 upper .95
-#> Age               0.9922     1.0079    0.9684    1.0166
-#> NumPartners       1.0113     0.9889    0.9124    1.1208
-#> CondomUse2        0.9463     1.0567    0.6015    1.4888
-#> CondomUse3        0.7148     1.3989    0.4470    1.1430
-#> YearsSchool       0.8750     1.1429    0.8131    0.9415
-#> InitInfect2       0.6792     1.4723    0.5097    0.9051
-#> InitInfect3       0.7906     1.2649    0.5919    1.0560
-#> InvVagAtExam1     1.4947     0.6690    1.0701    2.0877
-#> DischargeExam1    0.6925     1.4440    0.4471    1.0726
-#> 
-#> Concordance= 0.602  (se = 0.017 )
-#> Likelihood ratio test= 45.8  on 9 df,   p=7e-07
-#> Wald test            = 46.94  on 9 df,   p=4e-07
-#> Score (logrank) test = 47.21  on 9 df,   p=4e-07
+#>                       coef exp(coef)   se(coef)          z     Pr(>|z|)
+#> Age            -0.00783097 0.9921996 0.01237892 -0.6326050 0.5269915929
+#> NumPartners     0.01119536 1.0112583 0.05248331  0.2133127 0.8310830727
+#> CondomUse2     -0.05519517 0.9463004 0.23121727 -0.2387156 0.8113261078
+#> CondomUse3     -0.33570604 0.7148332 0.23948574 -1.4017788 0.1609813112
+#> YearsSchool    -0.13356369 0.8749717 0.03740282 -3.5709522 0.0003556858
+#> InitInfect2    -0.38680211 0.6792255 0.14648410 -2.6405740 0.0082765721
+#> InitInfect3    -0.23500491 0.7905670 0.14768228 -1.5912871 0.1115449801
+#> InvVagAtExam1   0.40191622 1.4946861 0.17048096  2.3575432 0.0183963138
+#> DischargeExam1 -0.36743845 0.6925059 0.22324601 -1.6458903 0.0997863366
 \end{verbatim}
 
 How do we interpret this model fit? First of all, the model we have fit follows the expression
 
 \[
-\lambda(t|\mathbf{Z}) =  \exp(\mathbf{\gamma}^T\mathbf{Z})\lambda_0(t),  
+\lambda(t|\mathbf{Z}) =  \exp(\mathbf{\beta}^T\mathbf{Z})\lambda_0(t),  
 \]
 
-where \(\gamma\) are the parameters in the model and \(\mathbf{Z}\) is the profile of the woman. Additionally, \(\lambda_0(t)\) is the hazard at time \(t\) for a woman with profile \(\mathbf{Z} = 0\), i.e.~a woman that always uses a condom, that was initially infected with (only) gonnorhea, that did not experience vaginal involvement at exam and did not experience discharge at exam. \textbf{Again: What do we do with the continuous covariates?}
+where \(\beta\) are the parameters in the model and \(\mathbf{Z}\) is the profile of the woman. Additionally, \(\lambda_0(t)\) is the hazard at time \(t\) for a woman with profile \(\mathbf{Z} = 0\), i.e.~a woman that always uses a condom, that was initially infected with (only) gonnorhea, that did not experience vaginal involvement at exam and did not experience discharge at exam. The model assumes that the hazard ratio is proportionally equal to \(\exp(\mathbf{\beta}^T\mathbf{Z})\) at all times. Said in other words, it relates the instantaneous risk for a woman with profile \(\mathbf{Z}\) at time \(t\) with the instantaneous risk for a woman with the baseline profile at the same time \(t\).
+
+\textbf{Again: What do we do with the continuous covariates? The same right?}
+
+The model parameters \(\beta\) can be interpreted in terms of relative hazards. As is seen from the formula above, the hazard ratio between a woman with profile \(\mathbf{Z}\) and a woman with profile \(\mathbf{Z} = \mathbf{0}\) is \(\exp(\mathbf{\beta}^T\), where the values are given in the second column of the table above. The interpretation in terms of relative hazards in this case is the same as the interpretation of the Weibull survival model fit earlier, since the Weibull regression model allows a representation of the proportional hazards model. This is done by setting \(\beta = -\gamma/\sigma\). Note that, because of this, the values for \texttt{exp(coef)} in the table above and the \texttt{HR}-values for the Weibull model calculated earlier are very similar, as they should. They are not exactly the same for numerical reasons when fitting the models.
+
+Analysis of residuals is done in the last lab, tuesday 21.12.21.
 
 \hypertarget{conclusions}{%
 \section{Conclusions}\label{conclusions}}
