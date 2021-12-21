@@ -141,7 +141,7 @@
 \makeatother
 \subtitle{Lifetime Data Analysis}
 \author{Rodrigo Arriaza, Alexander J Ohrt}
-\date{20 desember, 2021}
+\date{21 desember, 2021}
 
 \begin{document}
 \maketitle
@@ -370,6 +370,9 @@ The standard Gumbel distribution seems to fit relatively nicely to the Kaplan-Me
 
 The probability plots above also show that the Weibull is the better parametric model for the data, because the log-logistic and lognormal models clearly do not fit the line in the tails.
 
+\hypertarget{interpretation}{%
+\subsection{Interpretation}\label{interpretation}}
+
 How do we interpret this model fit? First of all, the model we have fit follows the expression
 
 \[
@@ -457,6 +460,9 @@ The proportional hazards model is fit below.
 #> DischargeExam1 -0.36743845 0.6925059 0.22324601 -1.6458903 0.0997863366
 \end{verbatim}
 
+\hypertarget{interpretation-1}{%
+\subsection{Interpretation}\label{interpretation-1}}
+
 How do we interpret this model fit? First of all, the model we have fit follows the expression
 
 \[
@@ -469,11 +475,93 @@ where \(\beta\) are the parameters in the model and \(\mathbf{Z}\) is the profil
 
 The model parameters \(\beta\) can be interpreted in terms of relative hazards. As is seen from the formula above, the hazard ratio between a woman with profile \(\mathbf{Z}\) and a woman with profile \(\mathbf{Z} = \mathbf{0}\) is \(\exp(\mathbf{\beta}^T\), where the values are given in the second column of the table above. The interpretation in terms of relative hazards in this case is the same as the interpretation of the Weibull survival model fit earlier, since the Weibull regression model allows a representation of the proportional hazards model. This is done by setting \(\beta = -\gamma/\sigma\). Note that, because of this, the values for \texttt{exp(coef)} in the table above and the \texttt{HR}-values for the Weibull model calculated earlier are very similar, as they should. They are not exactly the same for numerical reasons when fitting the models.
 
-Analysis of residuals is done in the last lab, tuesday 21.12.21.
+\hypertarget{analysis-of-residuals}{%
+\subsection{Analysis of Residuals}\label{analysis-of-residuals}}
 
-\hypertarget{conclusions}{%
-\section{Conclusions}\label{conclusions}}
+In this section we will check the Cox-model's goodness-of-fit. \textbf{Not very satisfied with a lot of the GOF I did below, something else we can do also? Check material.}
 
-Conclude on if some of the chosen explanatory variables are risk factors or protective factors for reinfection.
+\hypertarget{proportional-hazards-assumption}{%
+\subsubsection{Proportional Hazards Assumption}\label{proportional-hazards-assumption}}
+
+First of all, the Shoenfeld residuals can be used to check the proportional hazards assumption. The residuals are plotted below. The lines in the plots look relatively straight, which indicates that the proportionality assumption might hold.
+
+\includegraphics{practical_files/figure-latex/unnamed-chunk-5-1.pdf}
+
+\begin{table}
+
+\caption{\label{tab:unnamed-chunk-6}Hypothesis Test for Proportionality Assumption (Shoenfeld)}
+\centering
+\begin{tabular}[t]{l|r|r|r}
+\hline
+  & chisq & df & p\\
+\hline
+Age & 1.5024354 & 1 & 0.2202970\\
+\hline
+NumPartners & 0.9963277 & 1 & 0.3182007\\
+\hline
+CondomUse & 3.0132522 & 2 & 0.2216566\\
+\hline
+YearsSchool & 0.0247726 & 1 & 0.8749349\\
+\hline
+InitInfect & 3.5534579 & 2 & 0.1691907\\
+\hline
+InvVagAtExam & 1.3535072 & 1 & 0.2446659\\
+\hline
+DischargeExam & 0.4134607 & 1 & 0.5202182\\
+\hline
+GLOBAL & 11.8922549 & 9 & 0.2194519\\
+\hline
+\end{tabular}
+\end{table}
+
+The hypothesis test for the proportionality assumption on each of the covariates is applied above. As the table shows, all \(p\)-values are large compared to any reasonable significance level, which means that we do not reject the null hypothesis and we can conclude that the property of proportionality of the covariates is reasonably fulfilled.
+
+\textbf{The plots or table above might need to be removed later, but we will see in the end.}
+
+\textbf{DO THE ANALYTIC CHECK AND/OR GRAPHICAL CHECK THAT THEY TALK ABOUT IN THE SLIDES ALSO?}
+
+\hypertarget{influential-observations-in-the-global-fit}{%
+\subsubsection{Influential Observations in the Global Fit}\label{influential-observations-in-the-global-fit}}
+
+Secondly, we can check if there are any influential observations using residuals based on the score residuals. A transformation of the score residuals for each of the four coefficients is plotted below. More precisely, each residual that is plotted is the approximate change in the coefficient vector if the observation in question is dropped, scaled by the standard error of the coefficients.
+
+\includegraphics{practical_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+From the plots above, it becomes apparent that there clearly are some influential observations for each of the covariates.
+
+\textbf{Perhaps better to just remove the plots? Could identify the influential observations and comment on the work done in the report, without showing the plots? Do it.}*
+
+\hypertarget{linear-covariates-assumption}{%
+\subsubsection{Linear Covariates Assumption}\label{linear-covariates-assumption}}
+
+Thirdly, the the linear assumption of the continuous variables \texttt{Age}, \texttt{NumPartners} and \texttt{YearsSchool} is checked.
+
+\includegraphics{practical_files/figure-latex/unnamed-chunk-8-1.pdf}
+
+As can be seen from the plots above, the linear assumption of age seems to hold just fine, while the linear assumption for the two other continuous covariates is more uncertain if holds based on the smoother, which is not flat at all.
+
+\textbf{Perhaps these plots need to be removed as well? This part of the GOF is perhaps not as important either way. :( Hard to do the GOF-checks without plots perhaps, but I don't think these plots are the most important in the report.}
+
+\hypertarget{martingale-residuals-can-be-used-for-global-fit-not-sure-how}{%
+\subsubsection{Martingale Residuals (Can be used for global fit? Not sure how)}\label{martingale-residuals-can-be-used-for-global-fit-not-sure-how}}
+
+\includegraphics{practical_files/figure-latex/unnamed-chunk-9-1.pdf}
+
+\hypertarget{conclusions-add-more-later-probably.-also-clean-up-text.}{%
+\section{Conclusions (ADD MORE LATER PROBABLY. Also clean up text.)}\label{conclusions-add-more-later-probably.-also-clean-up-text.}}
+
+Assuming that the parametric and semi-parametric models can be trusted, the data analysis has uncovered some possible protective factors and risk-factors for reinfection with gonorrhea or chlamydia in women who had suffered one of both infections previously.
+
+\hypertarget{protective-factors}{%
+\subsection{Protective Factors}\label{protective-factors}}
+
+The covariates \texttt{YearsSchool} and \texttt{InitInfect2} (Initial infection of Chlamydia only) are statistically significant to a level \(\alpha = 0.05\) in both the parametric and semi-parametric model. Moreover, the logrank tests of the survival curves yield the conclusion that the levels of \texttt{InitInfect} yield different survival curve, which supports the conclusion based on the models. Both these covariates are estimated to being protective factors against reinfection. When it comes to the initial infection of Chlamydia, it is estimated to reduce the instantaneous risk compared to a person with Gonorrhea as initial infection by approximately 33\% according to the parametric Weibull model and the Cox-model. Moreover, each unitary increase in \texttt{YearsSchool} is estimated to reduce the instantaneous risk by approximately 12\% according to the parametric Weibull model and the Cox-model. Recall that in all these estimations it is assumed that the rest of the profile of each individual is the same, except for the described change.
+
+\hypertarget{risk-factors}{%
+\subsection{Risk-factors}\label{risk-factors}}
+
+The covariate \texttt{InvVagAtExam1} (yes) is statistically significant to a level \(\alpha = 0.05\) in both the parametric and semi-parametric model. Moreover, the logrank test of the survival curves yield the conclusion that the levels of the covariate yields different survival curves, which supports the conclusion based on the models. This is estimated to being a risk factor by both models. It is estimated to increasing the instantaneous risk compared a person not experiencing involvement of vagina at exam (with identical profile except for this change) by approximately 48\%, when selecting the slightly more optimistic estimate of the Weibull model instead of the more pessimistic estimate from the Cox model 49\%.
+
+\textbf{Perhaps do some predictions of new data (as shown in lab 7 I think), to further quantify the conclusions? We don't have to, but could.}
 
 \end{document}
