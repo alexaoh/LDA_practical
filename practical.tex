@@ -1,14 +1,25 @@
 % Options for packages loaded elsewhere
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
-\PassOptionsToPackage{dvipsnames,svgnames*,x11names*}{xcolor}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
 %
 \documentclass[
 ]{article}
+\title{Practical Work}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{Lifetime Data Analysis}
+\author{Rodrigo Arriaza, Alexander J Ohrt}
+\date{27 December, 2021}
+
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
-\usepackage{ifxetex,ifluatex}
-\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+\usepackage{iftex}
+\ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
@@ -40,10 +51,10 @@
   pdftitle={Practical Work},
   pdfauthor={Rodrigo Arriaza, Alexander J Ohrt},
   colorlinks=true,
-  linkcolor=Maroon,
-  filecolor=Maroon,
-  citecolor=Blue,
-  urlcolor=blue,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={blue},
   pdfcreator={LaTeX via pandoc}}
 \urlstyle{same} % disable monospaced font for URLs
 \usepackage[margin=1in]{geometry}
@@ -128,20 +139,9 @@
 \usepackage[normalem]{ulem}
 \usepackage{makecell}
 \usepackage{xcolor}
-\ifluatex
+\ifLuaTeX
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
-
-\title{Practical Work}
-\usepackage{etoolbox}
-\makeatletter
-\providecommand{\subtitle}[1]{% add subtitle to \maketitle
-  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
-}
-\makeatother
-\subtitle{Lifetime Data Analysis}
-\author{Rodrigo Arriaza, Alexander J Ohrt}
-\date{21 desember, 2021}
 
 \begin{document}
 \maketitle
@@ -182,7 +182,7 @@ Naturally, the categorical variable which states if the woman is reinfected or n
 \hypertarget{statistical-variable-selection}{%
 \subsection{Statistical Variable Selection}\label{statistical-variable-selection}}
 
-As noted, in addition to medical criteria for selecting variables, we have used the following statistical model to select variables based on statistical criteria. Shown below. RODRI: EXPLAIN!
+As noted, in addition to medical criteria for selecting variables, we have used a negative binomial model to discover which variables are statistically significant to the event of reinfection. The negative binomial model can be fitted when the occurence of events is a count for each patient, as described in \href{https://pubmed.ncbi.nlm.nih.gov/22083507/}{this article}. Thereby including all the variables in the model and converting the time into an offset since we are comparing counts for different follow-up times (a person that has been in the study longer would have higher chances of getting reinfected).
 
 REMOVE THIS AFTER: I made a list of things that can be used in the explanation:
 
@@ -200,17 +200,19 @@ REMOVE THIS AFTER: I made a list of things that can be used in the explanation:
           \SpecialCharTok{+}\NormalTok{ SignItch }\SpecialCharTok{+}\NormalTok{ SignLesion }\SpecialCharTok{+}\NormalTok{ SignRash }\SpecialCharTok{+}\NormalTok{ SignLymph }\SpecialCharTok{+}\NormalTok{ InvVagAtExam }
           \SpecialCharTok{+}\NormalTok{ DischargeExam }\SpecialCharTok{+}\NormalTok{ AbnormNodeExam }\SpecialCharTok{+} \FunctionTok{offset}\NormalTok{(}\FunctionTok{log}\NormalTok{(TimeUntilReinf)),}
               \AttributeTok{data=}\NormalTok{std\_data)}
+\NormalTok{p.model }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(Reinfection }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Ethnicity }\SpecialCharTok{+}\NormalTok{ MaritalStatus }\SpecialCharTok{+}\NormalTok{ Age }\SpecialCharTok{+}\NormalTok{ YearsSchool }
+          \SpecialCharTok{+}\NormalTok{ InitInfect }\SpecialCharTok{+}\NormalTok{ NumPartners }\SpecialCharTok{+}\NormalTok{OralSex12m }\SpecialCharTok{+}\NormalTok{ OralSex30d }\SpecialCharTok{+}\NormalTok{ RectalSex12m }
+          \SpecialCharTok{+}\NormalTok{ RectalSex30d }\SpecialCharTok{+}\NormalTok{ AbPain }\SpecialCharTok{+}\NormalTok{ SignDischarge }\SpecialCharTok{+}\NormalTok{ SignDysuria }\SpecialCharTok{+}\NormalTok{ CondomUse }
+          \SpecialCharTok{+}\NormalTok{ SignItch }\SpecialCharTok{+}\NormalTok{ SignLesion }\SpecialCharTok{+}\NormalTok{ SignRash }\SpecialCharTok{+}\NormalTok{ SignLymph }\SpecialCharTok{+}\NormalTok{ InvVagAtExam }
+          \SpecialCharTok{+}\NormalTok{ DischargeExam }\SpecialCharTok{+}\NormalTok{ AbnormNodeExam }\SpecialCharTok{+} \FunctionTok{offset}\NormalTok{(}\FunctionTok{log}\NormalTok{(TimeUntilReinf)),}
+              \AttributeTok{data=}\NormalTok{std\_data, }\AttributeTok{family =} \FunctionTok{poisson}\NormalTok{())}
 \NormalTok{s }\OtherTok{\textless{}{-}} \FunctionTok{summary}\NormalTok{(nb.model)}
-\NormalTok{k }\OtherTok{\textless{}{-}}\NormalTok{ knitr}\SpecialCharTok{::}\FunctionTok{kable}\NormalTok{(s}\SpecialCharTok{$}\NormalTok{coefficients, }\AttributeTok{caption =} \StringTok{\textquotesingle{}Statistical Significance of the Variables\textquotesingle{}}\NormalTok{)}
+\NormalTok{k }\OtherTok{\textless{}{-}}\NormalTok{ knitr}\SpecialCharTok{::}\FunctionTok{kable}\NormalTok{(s}\SpecialCharTok{$}\NormalTok{coefficients)}
 \NormalTok{kableExtra}\SpecialCharTok{::}\FunctionTok{row\_spec}\NormalTok{(k, }\FunctionTok{c}\NormalTok{(}\DecValTok{6}\NormalTok{,}\DecValTok{23}\NormalTok{,}\DecValTok{24}\NormalTok{), }\AttributeTok{color=}\StringTok{\textquotesingle{}white\textquotesingle{}}\NormalTok{, }\AttributeTok{background =} \StringTok{\textquotesingle{}blue\textquotesingle{}}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{table}
-
-\caption{\label{tab:variable-select}Statistical Significance of the Variables}
-\centering
-\begin{tabular}[t]{l|r|r|r|r}
+\begin{tabular}{l|r|r|r|r}
 \hline
   & Estimate & Std. Error & z value & Pr(>|z|)\\
 \hline
@@ -265,9 +267,8 @@ SignLymph1 & 0.2368538 & 0.5922357 & 0.3999317 & 0.6892069\\
 AbnormNodeExam1 & 0.0801562 & 0.5157541 & 0.1554155 & 0.8764938\\
 \hline
 \end{tabular}
-\end{table}
 
-Finally, the vaginal involvement at exam (\texttt{InvVagAtExam}) and the discharge at exam (\texttt{DischargeExam}) are selected as variables in our analysis, since they are shown as statistically significant in the variable selection above.
+Finally, the vaginal involvement at exam (\texttt{InvVagAtExam}) and the discharge at exam (\texttt{DischargeExam}) are selected as variables in our analysis, since they are shown as statistically significant in \ref{fig:variable-select}.
 
 \hypertarget{descriptive-analysis}{%
 \section{Descriptive Analysis}\label{descriptive-analysis}}
