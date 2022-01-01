@@ -281,7 +281,7 @@ $$
 \mathbf{Z}^T = (Age, NumPartn., Cond., YSchool, InitInf., InvVagAtExam., DischargeAtExam), 
 $$
 
-is the vector of values. Thus, each of the quantities $\exp(\gamma_i)$ can be interpreted as the unitary change in time until reinfection (when covariate $i$ is continuous), or the change in time until reinfection when changing level (when the covariate $i$ is categorical with different levels), when all the other explanatory variables are kept fixed. This means that a positive parameter estimate $\hat{\gamma}_i$ gives $\exp(\gamma_i) > 0$, which means that the covariate is estimated to being protective by the model, since it increases $\ln(T)$. The oppositve holds for $\hat{\gamma}_i < 0$. These interpretations will be done with the acceleration factor and relative hazard next. 
+is the vector of values. Thus, each of the quantities $\exp(\gamma_i)$ can be interpreted as the unitary change in time until reinfection (when covariate $i$ is continuous), or the change in time until reinfection when changing level (when the covariate $i$ is categorical with different levels), when all the other explanatory variables are kept fixed. This means that a positive parameter estimate $\hat{\gamma}_i$ gives $\exp(\gamma_i) > 0$, which means that the covariate is estimated to being protective by the model, since it increases $\ln(T)$. The opposite holds for $\hat{\gamma}_i < 0$. These interpretations will be done with the acceleration factor and relative hazard next. 
 
 In the Weibull model, the acceleration factor (AF) is calculated using the equation
 
@@ -327,9 +327,7 @@ $$
 \lambda(t|\mathbf{Z}) =  \exp(\mathbf{\beta}^T\mathbf{Z})\lambda_0(t),  
 $$
 
-where $\beta$ are the parameters in the model and $\mathbf{Z}$ is the profile of the woman. Additionally, $\lambda_0(t)$ is the hazard at time $t$ for a woman with profile $\mathbf{Z} = 0$, i.e. a woman that always uses a condom, that was initially infected with (only) gonnorhea, that did not experience vaginal involvement at exam and did not experience discharge at exam. The model assumes that the hazard ratio is proportionally equal to $\exp(\mathbf{\beta}^T\mathbf{Z})$ at all times. Said in other words, it relates the instantaneous risk for a woman with profile $\mathbf{Z}$ at time $t$ with the instantaneous risk for a woman with the baseline profile at the same time $t$. 
-
-**Again: What do we do with the continuous covariates? The same right?** 
+where $\beta$ are the parameters in the model and $\mathbf{Z}$ is the profile of the woman. Additionally, $\lambda_0(t)$ is the hazard at time $t$ for a woman with profile $\mathbf{Z} = 0$, i.e. a woman that always uses a condom, that was initially infected with (only) gonorrhea, that did not experience vaginal involvement at exam and did not experience discharge at exam. The model assumes that the hazard ratio is proportionally equal to $\exp(\mathbf{\beta}^T\mathbf{Z})$ at all times. Said in other words, it relates the instantaneous risk for a woman with profile $\mathbf{Z}$ at time $t$ with the instantaneous risk for a woman with the baseline profile at the same time $t$. 
 
 The model parameters $\beta$ can be interpreted in terms of relative hazards. As is seen from the formula above, the hazard ratio between a woman with profile $\mathbf{Z}$ and a woman with profile $\mathbf{Z} = \mathbf{0}$ is $\exp(\mathbf{\beta}^T$, where the values are given in the second column of the table above. The interpretation in terms of relative hazards in this case is the same as the interpretation of the Weibull survival model fit earlier, since the Weibull regression model allows a representation of the proportional hazards model. This is done by setting $\beta = -\gamma/\sigma$. Note that, because of this, the values for `exp(coef)` in the table above and the `HR`-values for the Weibull model calculated earlier are very similar, as they should. They are not exactly the same for numerical reasons when fitting the models. 
 
@@ -348,7 +346,7 @@ par(mfrow = c(2, 4), font = 2, font.lab = 4, font.axis = 2, las = 1,
 plot(cox.shoenfeld.test, lwd = 2)
 ```
 
-```{r}
+```{r schoenfeld-table}
 knitr::kable(cox.shoenfeld.test$table, caption = "Hypothesis Test for Proportionality Assumption (Shoenfeld)")
 ```
 
@@ -358,11 +356,18 @@ The hypothesis test for the proportionality assumption on each of the covariates
 
 **DO THE ANALYTIC CHECK AND/OR GRAPHICAL CHECK THAT THEY TALK ABOUT IN THE SLIDES ALSO?**
 
+```{r graphical-analysis, out.width='32%', fig.show='hold'}
+par(mar = c(4, 4, .1, .1))
+plot(cox.shoenfeld.test)
+```
+
+In the plots above it is noticeable that they all show a horizontal line which confirms the numerical analysis from \@ref(tab:schoenfeld-table).
+
 ### Influential Observations in the Global Fit
 
 Secondly, we can check if there are any influential observations using residuals based on the score residuals. A transformation of the score residuals for each of the four coefficients is plotted below. More precisely, each residual that is plotted is the approximate change in the coefficient vector if the observation in question is dropped, scaled by the standard error of the coefficients. 
 
-```{r}
+```{r, include=F}
 dfbet <- residuals(cox1, type = "dfbetas")
 
 par(mfrow = c(3, 3), font = 2, font.lab = 4, font.axis = 2, las = 1,
@@ -376,7 +381,23 @@ for (i in 1:9) {
 
 From the plots above, it becomes apparent that there clearly are some influential observations for each of the covariates. 
 
-**Perhaps better to just remove the plots? Could identify the influential observations and comment on the work done in the report, without showing the plots? Do it.***
+```{r}
+# influential observations
+# age: 4, 498
+# NumPartners: 11, 574, 831
+# CondomUse2: 221
+# CondomUse3: 221
+# YearsSchool: NA
+# InitInfect2: 366
+# InitInfect3: 221, 366
+# InvVagAtExam1: 525
+# DischargeExam1: 154, 831
+influential <- c(4,11,154, 221, 366, 498,525, 574, 831)
+std_data[influential,]
+```
+
+By plotting the residuals it was possible to identify as influential observations the individuals with observation numbers: 4, 11, 154, 221, 366, 525, 574, 831. Individuals 4, 498 and 574 showed an unexpectedly short time until reinfection, especially for individuals of their age (older than 40). 
+Whereas the other individuals exhibit a much greater time until reinfection, with almost all of them having more than 1000 days until the event. 
 
 ### Linear Covariates Assumption
 
