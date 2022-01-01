@@ -93,7 +93,7 @@ k <- knitr::kable(s$coefficients)
 kableExtra::row_spec(k, c(6,23,24), color='white', background = 'blue')
 ```
 
-Finally, the vaginal involvement at exam (`InvVagAtExam`) and the discharge at exam (`DischargeExam`) are selected as variables in our analysis, since they are shown as statistically significant in \@ref(fig:variable-select). 
+Finally, the vaginal involvement at exam (`InvVagAtExam`) and the discharge at exam (`DischargeExam`) are selected as variables in our analysis, since they are shown as statistically significant in \@ref(tab:variable-select). 
 
 # Descriptive Analysis
 
@@ -109,6 +109,7 @@ barplot(height = table(final.data %>% dplyr::select(InitInfect)), main = "Counts
 barplot(height = table(final.data %>% dplyr::select(InvVagAtExam)), main = "Counts of InvVagAtExam")
 barplot(height = table(final.data %>% dplyr::select(DischargeExam)), main = "Counts of DischargeExam")
 ```
+
 The three continuous variables we have chosen to use in the analysis are `Age`, `YearsSchool` and `NumPartners`. The correlations between the variables are shown in table \@ref(tab:correlations). Note that the correlation between `Age` and `YearsSchool` is `r round(cor(std_data$Age, std_data$YearsSchool), 2)`, which means that they are somewhat correlated. This could be interesting to have in mind in the following. 
 
 ```{r correlations}
@@ -122,7 +123,7 @@ knitr::kable(correlations, align = "c", caption = "Corr. Between Continuous Vari
 
 The survival curve is estimated by means of Kaplan-Meier and plotted below. The curve below shows the general survival in the data set.
 
-```{r}
+```{r survivalf, fig.cap='Survival function of time until reinfection'}
 s1 <- with(std_data, Surv(TimeUntilReinf, Reinfection) ~ 1)
 s1fit <- survfit(s1)
 #plot(s1fit)
@@ -202,14 +203,13 @@ weibull.full  <- survreg(s2 ~ ., data = final.data, dist = "weibull")
 (s.weibull <- summary(weibull.full))
 ```
 
-```{r weibull-resids}
+```{r weibull-resids, fig.cap='Residuals of the Weibull Regression Model'}
 weibull.pred <- predict(weibull.full, type = "linear")
 resids.weibull <- (log(std_data$TimeUntilReinf) - weibull.pred) / weibull.full$scale
 par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
 plot(survfit(Surv(resids.weibull, std_data$Reinfection) ~ 1), col = c(1,2,2), xlab = "Residuals",
      ylab = expression(bolditalic(hat(S)(t))),
      lty = 1, lwd = 3, yaxs = "i", xaxs = "i", bty = "n")
-title("Residuals of the Weibull Regression Model")
 survgumb <- function(x) {
   return(exp(-exp(x)))
 }
@@ -219,7 +219,7 @@ legend("bottomleft", c("KM estimate", "95% - CI", "Stand. Gumbel Distribution"),
        col = c(1, 2, 3), lty = c(1, 2, 1), lwd = 3, bty = "n")
 ```
 
-The standard Gumbel distribution seems to fit relatively nicely to the Kaplan-Meier estimate of the residuals, i.e. it seems like a reasonable choice for the error term $W$, which indicates that the Weibull is a reasonable model. 
+As seen in \@ref(fig:weibull-resids), the standard Gumbel distribution seems to fit relatively nicely to the Kaplan-Meier estimate of the residuals, i.e. it seems like a reasonable choice for the error term $W$, which indicates that the Weibull is a reasonable model. 
 
 ```{r fit-lognormal, include= F}
 lognormal.full <- update(weibull.full, dist = "lognormal")
@@ -255,11 +255,11 @@ legend("bottomleft", c("KM estimate", "95% - CI", "Stand. Logistic Distribution"
        col = c(1, 2, 3), lty = c(1, 2, 1), lwd = 3, bty = "n")
 ```
 
-```{r cumhaz-plot, results = "hide", fig.height=3}
+```{r cumhaz-plot, results = "hide", fig.height=3, fig.cap='Cumulative hazard plots comparison'}
 cumhazPlot(std_data$TimeUntilReinf, std_data$Reinfection,col = 4, distr = c("wei", "loglo", "lognormal"), font.lab = 4)
 ```
 
-The probability plots above also show that the Weibull is the better parametric model for the data, because the log-logistic and lognormal models clearly do not fit the line in the tails. 
+The probability plots in \@ref(fig:cumhaz-plot) also show that the Weibull is the better parametric model for the data, because the log-logistic and lognormal models clearly do not fit the line in the tails. 
 
 ## Interpretation 
 

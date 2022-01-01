@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2021/W32TeX) (preloaded format=pdflatex 2021.12.26)  27 DEC 2021 16:46
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2021/W32TeX) (preloaded format=pdflatex 2021.12.26)  1 JAN 2022 16:37
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -738,7 +738,7 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <5> on input line 215.
 [2]
 
-LaTeX Warning: Reference `fig:variable-select' on page 3 undefined on input lin
+LaTeX Warning: Reference `tab:variable-select' on page 3 undefined on input lin
 e 271.
 
 <practical_files/figure-latex/EDA-plots-1.pdf, id=98, 469.755pt x 397.485pt>
@@ -747,97 +747,166 @@ File: practical_files/figure-latex/EDA-plots-1.pdf Graphic file (type pdf)
 Package pdftex.def Info: practical_files/figure-latex/EDA-plots-1.pdf  used on 
 input line 278.
 (pdftex.def)             Requested size: 469.75386pt x 397.48402pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 278--280
-[][]
- []
-
 [3]
-<practical_files/figure-latex/unnamed-chunk-1-1.pdf, id=106, 469.755pt x 289.08
-pt>
-File: practical_files/figure-latex/unnamed-chunk-1-1.pdf Graphic file (type pdf
-)
-<use practical_files/figure-latex/unnamed-chunk-1-1.pdf>
-Package pdftex.def Info: practical_files/figure-latex/unnamed-chunk-1-1.pdf  us
-ed on input line 306.
+<practical_files/figure-latex/survivalf-1.pdf, id=106, 469.755pt x 289.08pt>
+File: practical_files/figure-latex/survivalf-1.pdf Graphic file (type pdf)
+<use practical_files/figure-latex/survivalf-1.pdf>
+Package pdftex.def Info: practical_files/figure-latex/survivalf-1.pdf  used on 
+input line 309.
 (pdftex.def)             Requested size: 469.75386pt x 289.07928pt.
 [4pdfTeX warning (ext4): destination with the same identifier (name{table.1}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.308 T
-       he median survival time is estimated to be 705 days. <./practical_files/
-figure-latex/EDA-plots-1.pdf>] [5pdfTeX warning (ext4): destination with the sa
-me identifier (name{table.2}) has been already used, duplicate ignored
+l.311 \end{figure}
+                   <./practical_files/figure-latex/EDA-plots-1.pdf>] [5pdfTeX w
+arning (ext4): destination with the same identifier (name{figure.1}) has been a
+lready used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.339 
-       <./practical_files/figure-latex/unnamed-chunk-1-1.pdf>]
-<practical_files/figure-latex/weibull-resids-1.pdf, id=140, 469.755pt x 289.08p
+l.344 
+       <./practical_files/figure-latex/survivalf-1.pdf>]
+<practical_files/figure-latex/weibull-resids-1.pdf, id=141, 469.755pt x 289.08p
 t>
 File: practical_files/figure-latex/weibull-resids-1.pdf Graphic file (type pdf)
 
 <use practical_files/figure-latex/weibull-resids-1.pdf>
 Package pdftex.def Info: practical_files/figure-latex/weibull-resids-1.pdf  use
-d on input line 366.
+d on input line 373.
 (pdftex.def)             Requested size: 469.75386pt x 289.07928pt.
-[6 <./practical_files/figure-latex/weibull-resids-1.pdf>]
-<practical_files/figure-latex/cumhaz-plot-1.pdf, id=152, 469.755pt x 216.81pt>
+<practical_files/figure-latex/cumhaz-plot-1.pdf, id=143, 469.755pt x 216.81pt>
 File: practical_files/figure-latex/cumhaz-plot-1.pdf Graphic file (type pdf)
 <use practical_files/figure-latex/cumhaz-plot-1.pdf>
 Package pdftex.def Info: practical_files/figure-latex/cumhaz-plot-1.pdf  used o
-n input line 370.
+n input line 381.
 (pdftex.def)             Requested size: 469.75386pt x 216.80946pt.
-[7 <./practical_files/figure-latex/cumhaz-plot-1.pdf>] [8pdfTeX warning (ext4):
- destination with the same identifier (name{table.3}) has been already used, du
-plicate ignored
+[6pdfTeX warning (ext4): destination with the same identifier (name{table.2}) h
+as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.469 \[
-        ]
-<practical_files/figure-latex/unnamed-chunk-5-1.pdf, id=176, 469.755pt x 289.08
+l.400 \]
+        ] [7pdfTeX warning (ext4): destination with the same identifier (name{f
+igure.2}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.400 \]
+        pdfTeX warning (ext4): destination with the same identifier (name{figur
+e.3}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.400 \]
+         <./practical_files/figure-latex/weibull-resids-1.pdf> <./practical_fil
+es/figure-latex/cumhaz-plot-1.pdf>] [8pdfTeX warning (ext4): destination with t
+he same identifier (name{table.3}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.458 
+      ]
+<practical_files/figure-latex/unnamed-chunk-4-1.pdf, id=179, 469.755pt x 289.08
 pt>
-File: practical_files/figure-latex/unnamed-chunk-5-1.pdf Graphic file (type pdf
+File: practical_files/figure-latex/unnamed-chunk-4-1.pdf Graphic file (type pdf
 )
-<use practical_files/figure-latex/unnamed-chunk-5-1.pdf>
-Package pdftex.def Info: practical_files/figure-latex/unnamed-chunk-5-1.pdf  us
-ed on input line 489.
+<use practical_files/figure-latex/unnamed-chunk-4-1.pdf>
+Package pdftex.def Info: practical_files/figure-latex/unnamed-chunk-4-1.pdf  us
+ed on input line 500.
 (pdftex.def)             Requested size: 469.75386pt x 289.07928pt.
 [9]
-<practical_files/figure-latex/unnamed-chunk-7-1.pdf, id=183, 469.755pt x 289.08
+<practical_files/figure-latex/graphical-analysis-1.pdf, id=188, 469.755pt x 289
+.08pt>
+File: practical_files/figure-latex/graphical-analysis-1.pdf Graphic file (type 
+pdf)
+<use practical_files/figure-latex/graphical-analysis-1.pdf>
+Package pdftex.def Info: practical_files/figure-latex/graphical-analysis-1.pdf 
+ used on input line 535.
+(pdftex.def)             Requested size: 150.32466pt x 92.50748pt.
+<practical_files/figure-latex/graphical-analysis-2.pdf, id=189, 469.755pt x 289
+.08pt>
+File: practical_files/figure-latex/graphical-analysis-2.pdf Graphic file (type 
+pdf)
+<use practical_files/figure-latex/graphical-analysis-2.pdf>
+Package pdftex.def Info: practical_files/figure-latex/graphical-analysis-2.pdf 
+ used on input line 535.
+(pdftex.def)             Requested size: 150.32466pt x 92.50748pt.
+<practical_files/figure-latex/graphical-analysis-3.pdf, id=190, 469.755pt x 289
+.08pt>
+File: practical_files/figure-latex/graphical-analysis-3.pdf Graphic file (type 
+pdf)
+<use practical_files/figure-latex/graphical-analysis-3.pdf>
+Package pdftex.def Info: practical_files/figure-latex/graphical-analysis-3.pdf 
+ used on input line 535.
+(pdftex.def)             Requested size: 150.32466pt x 92.50748pt.
+<practical_files/figure-latex/graphical-analysis-4.pdf, id=191, 469.755pt x 289
+.08pt>
+File: practical_files/figure-latex/graphical-analysis-4.pdf Graphic file (type 
+pdf)
+<use practical_files/figure-latex/graphical-analysis-4.pdf>
+Package pdftex.def Info: practical_files/figure-latex/graphical-analysis-4.pdf 
+ used on input line 535.
+(pdftex.def)             Requested size: 150.32466pt x 92.50748pt.
+<practical_files/figure-latex/graphical-analysis-5.pdf, id=192, 469.755pt x 289
+.08pt>
+File: practical_files/figure-latex/graphical-analysis-5.pdf Graphic file (type 
+pdf)
+<use practical_files/figure-latex/graphical-analysis-5.pdf>
+Package pdftex.def Info: practical_files/figure-latex/graphical-analysis-5.pdf 
+ used on input line 535.
+(pdftex.def)             Requested size: 150.32466pt x 92.50748pt.
+<practical_files/figure-latex/graphical-analysis-6.pdf, id=193, 469.755pt x 289
+.08pt>
+File: practical_files/figure-latex/graphical-analysis-6.pdf Graphic file (type 
+pdf)
+<use practical_files/figure-latex/graphical-analysis-6.pdf>
+Package pdftex.def Info: practical_files/figure-latex/graphical-analysis-6.pdf 
+ used on input line 535.
+(pdftex.def)             Requested size: 150.32466pt x 92.50748pt.
+<practical_files/figure-latex/graphical-analysis-7.pdf, id=194, 469.755pt x 289
+.08pt>
+File: practical_files/figure-latex/graphical-analysis-7.pdf Graphic file (type 
+pdf)
+<use practical_files/figure-latex/graphical-analysis-7.pdf>
+Package pdftex.def Info: practical_files/figure-latex/graphical-analysis-7.pdf 
+ used on input line 535.
+(pdftex.def)             Requested size: 150.32466pt x 92.50748pt.
+
+Underfull \hbox (badness 4792) in paragraph at lines 535--536
+[][] [] []
+ []
+
+
+Underfull \hbox (badness 4792) in paragraph at lines 535--536
+[] [] []
+ []
+
+[10pdfTeX warning (ext4): destination with the same identifier (name{table.4}) 
+has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.536 
+       <./practical_files/figure-latex/unnamed-chunk-4-1.pdf> <./practical_file
+s/figure-latex/graphical-analysis-1.pdf> <./practical_files/figure-latex/graphi
+cal-analysis-2.pdf> <./practical_files/figure-latex/graphical-analysis-3.pdf>] 
+[11 <./practical_files/figure-latex/graphical-analysis-4.pdf> <./practical_file
+s/figure-latex/graphical-analysis-5.pdf> <./practical_files/figure-latex/graphi
+cal-analysis-6.pdf> <./practical_files/figure-latex/graphical-analysis-7.pdf>]
+<practical_files/figure-latex/unnamed-chunk-7-1.pdf, id=247, 469.755pt x 289.08
 pt>
 File: practical_files/figure-latex/unnamed-chunk-7-1.pdf Graphic file (type pdf
 )
 <use practical_files/figure-latex/unnamed-chunk-7-1.pdf>
 Package pdftex.def Info: practical_files/figure-latex/unnamed-chunk-7-1.pdf  us
-ed on input line 529.
+ed on input line 597.
 (pdftex.def)             Requested size: 469.75386pt x 289.07928pt.
-[10pdfTeX warning (ext4): destination with the same identifier (name{table.4}) 
-has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.531 F
-       rom the plots above, it becomes apparent that there clearly are some ...
- <./practical_files/figure-latex/unnamed-chunk-5-1.pdf>]
-<practical_files/figure-latex/unnamed-chunk-8-1.pdf, id=196, 469.755pt x 289.08
+[12 <./practical_files/figure-latex/unnamed-chunk-7-1.pdf>]
+<practical_files/figure-latex/unnamed-chunk-8-1.pdf, id=259, 469.755pt x 289.08
 pt>
 File: practical_files/figure-latex/unnamed-chunk-8-1.pdf Graphic file (type pdf
 )
 <use practical_files/figure-latex/unnamed-chunk-8-1.pdf>
 Package pdftex.def Info: practical_files/figure-latex/unnamed-chunk-8-1.pdf  us
-ed on input line 540.
+ed on input line 606.
 (pdftex.def)             Requested size: 469.75386pt x 289.07928pt.
-[11 <./practical_files/figure-latex/unnamed-chunk-7-1.pdf>]
-<practical_files/figure-latex/unnamed-chunk-9-1.pdf, id=208, 469.755pt x 289.08
-pt>
-File: practical_files/figure-latex/unnamed-chunk-9-1.pdf Graphic file (type pdf
-)
-<use practical_files/figure-latex/unnamed-chunk-9-1.pdf>
-Package pdftex.def Info: practical_files/figure-latex/unnamed-chunk-9-1.pdf  us
-ed on input line 549.
-(pdftex.def)             Requested size: 469.75386pt x 289.07928pt.
-[12 <./practical_files/figure-latex/unnamed-chunk-8-1.pdf>] [13 <./practical_fi
-les/figure-latex/unnamed-chunk-9-1.pdf>] [14] (./practical.aux)
+[13 <./practical_files/figure-latex/unnamed-chunk-8-1.pdf>] [14] (./practical.a
+ux)
 
 LaTeX Warning: There were undefined references.
 
@@ -845,13 +914,13 @@ Package rerunfilecheck Info: File `practical.out' has not changed.
 (rerunfilecheck)             Checksum: 094D2855F6D1BB0C781052D818B1C4E3;3655.
  ) 
 Here is how much of TeX's memory you used:
- 13890 strings out of 480313
- 222762 string characters out of 5895779
- 545672 words of memory out of 5000000
- 31429 multiletter control sequences out of 15000+600000
+ 13953 strings out of 480313
+ 225985 string characters out of 5895779
+ 557855 words of memory out of 5000000
+ 31483 multiletter control sequences out of 15000+600000
  464604 words of font info for 74 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 60i,9n,63p,1102b,351s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 60i,9n,63p,1102b,469s stack positions out of 5000i,500n,10000p,200000b,80000s
 {c:/Users/rodri/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.e
 nc}{c:/Users/rodri/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mat
 hsy.enc}{c:/Users/rodri/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/l
@@ -868,10 +937,10 @@ TeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:/Users/rodri/AppData/Roaming/
 TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb><c:/Users/rodri/AppData/Roami
 ng/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/Users/rodri/AppData/
 Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
-Output written on practical.pdf (14 pages, 1080533 bytes).
+Output written on practical.pdf (14 pages, 832295 bytes).
 PDF statistics:
- 309 PDF objects out of 1000 (max. 8388607)
- 250 compressed objects within 3 object streams
- 55 named destinations out of 1000 (max. 500000)
- 185 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 350 PDF objects out of 1000 (max. 8388607)
+ 279 compressed objects within 3 object streams
+ 58 named destinations out of 1000 (max. 500000)
+ 215 words of extra memory for PDF output out of 10000 (max. 10000000)
 
