@@ -14,7 +14,7 @@
 \makeatother
 \subtitle{Lifetime Data Analysis}
 \author{Rodrigo Arriaza, Alexander J Ohrt}
-\date{01 January, 2022}
+\date{06 January, 2022}
 
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
@@ -58,46 +58,6 @@
   pdfcreator={LaTeX via pandoc}}
 \urlstyle{same} % disable monospaced font for URLs
 \usepackage[margin=1in]{geometry}
-\usepackage{color}
-\usepackage{fancyvrb}
-\newcommand{\VerbBar}{|}
-\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
-\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
-% Add ',fontsize=\small' for more characters per line
-\usepackage{framed}
-\definecolor{shadecolor}{RGB}{248,248,248}
-\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
-\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
-\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
-\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\BuiltInTok}[1]{#1}
-\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
-\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
-\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
-\newcommand{\ExtensionTok}[1]{#1}
-\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\ImportTok}[1]{#1}
-\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\NormalTok}[1]{#1}
-\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
-\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
-\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
-\newcommand{\RegionMarkerTok}[1]{#1}
-\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
 \usepackage{longtable,booktabs,array}
 \usepackage{calc} % for calculating minipage widths
 % Correct order of tables after \paragraph or \subparagraph
@@ -184,117 +144,81 @@ Naturally, the categorical variable which states if the woman is reinfected or n
 
 As noted, in addition to medical criteria for selecting variables, we have used a negative binomial model to discover which variables are statistically significant to the event of reinfection. The negative binomial model can be fitted when the occurence of events is a count for each patient, as described in \href{https://pubmed.ncbi.nlm.nih.gov/22083507/}{this article}. Thereby including all the variables in the model and converting the time into an offset since we are comparing counts for different follow-up times (a person that has been in the study longer would have higher chances of getting reinfected).
 
-REMOVE THIS AFTER: I made a list of things that can be used in the explanation:
-
 \begin{itemize}
 \tightlist
 \item
   Despite the fact that the age of the woman is found to not be statistically significant in the method above, we have added it because of the mentioned studies (this is thus added based on medical criteria)
 \end{itemize}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{nb.model }\OtherTok{\textless{}{-}}\NormalTok{ MASS}\SpecialCharTok{::}\FunctionTok{glm.nb}\NormalTok{(Reinfection }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Ethnicity }\SpecialCharTok{+}\NormalTok{ MaritalStatus }\SpecialCharTok{+}\NormalTok{ Age }\SpecialCharTok{+}\NormalTok{ YearsSchool }
-          \SpecialCharTok{+}\NormalTok{ InitInfect }\SpecialCharTok{+}\NormalTok{ NumPartners }\SpecialCharTok{+}\NormalTok{OralSex12m }\SpecialCharTok{+}\NormalTok{ OralSex30d }\SpecialCharTok{+}\NormalTok{ RectalSex12m }
-          \SpecialCharTok{+}\NormalTok{ RectalSex30d }\SpecialCharTok{+}\NormalTok{ AbPain }\SpecialCharTok{+}\NormalTok{ SignDischarge }\SpecialCharTok{+}\NormalTok{ SignDysuria }\SpecialCharTok{+}\NormalTok{ CondomUse }
-          \SpecialCharTok{+}\NormalTok{ SignItch }\SpecialCharTok{+}\NormalTok{ SignLesion }\SpecialCharTok{+}\NormalTok{ SignRash }\SpecialCharTok{+}\NormalTok{ SignLymph }\SpecialCharTok{+}\NormalTok{ InvVagAtExam }
-          \SpecialCharTok{+}\NormalTok{ DischargeExam }\SpecialCharTok{+}\NormalTok{ AbnormNodeExam }\SpecialCharTok{+} \FunctionTok{offset}\NormalTok{(}\FunctionTok{log}\NormalTok{(TimeUntilReinf)),}
-              \AttributeTok{data=}\NormalTok{std\_data)}
-\NormalTok{p.model }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(Reinfection }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Ethnicity }\SpecialCharTok{+}\NormalTok{ MaritalStatus }\SpecialCharTok{+}\NormalTok{ Age }\SpecialCharTok{+}\NormalTok{ YearsSchool }
-          \SpecialCharTok{+}\NormalTok{ InitInfect }\SpecialCharTok{+}\NormalTok{ NumPartners }\SpecialCharTok{+}\NormalTok{OralSex12m }\SpecialCharTok{+}\NormalTok{ OralSex30d }\SpecialCharTok{+}\NormalTok{ RectalSex12m }
-          \SpecialCharTok{+}\NormalTok{ RectalSex30d }\SpecialCharTok{+}\NormalTok{ AbPain }\SpecialCharTok{+}\NormalTok{ SignDischarge }\SpecialCharTok{+}\NormalTok{ SignDysuria }\SpecialCharTok{+}\NormalTok{ CondomUse }
-          \SpecialCharTok{+}\NormalTok{ SignItch }\SpecialCharTok{+}\NormalTok{ SignLesion }\SpecialCharTok{+}\NormalTok{ SignRash }\SpecialCharTok{+}\NormalTok{ SignLymph }\SpecialCharTok{+}\NormalTok{ InvVagAtExam }
-          \SpecialCharTok{+}\NormalTok{ DischargeExam }\SpecialCharTok{+}\NormalTok{ AbnormNodeExam }\SpecialCharTok{+} \FunctionTok{offset}\NormalTok{(}\FunctionTok{log}\NormalTok{(TimeUntilReinf)),}
-              \AttributeTok{data=}\NormalTok{std\_data, }\AttributeTok{family =} \FunctionTok{poisson}\NormalTok{())}
-\NormalTok{s }\OtherTok{\textless{}{-}} \FunctionTok{summary}\NormalTok{(nb.model)}
-\NormalTok{k }\OtherTok{\textless{}{-}}\NormalTok{ knitr}\SpecialCharTok{::}\FunctionTok{kable}\NormalTok{(s}\SpecialCharTok{$}\NormalTok{coefficients)}
-\NormalTok{kableExtra}\SpecialCharTok{::}\FunctionTok{row\_spec}\NormalTok{(k, }\FunctionTok{c}\NormalTok{(}\DecValTok{6}\NormalTok{,}\DecValTok{23}\NormalTok{,}\DecValTok{24}\NormalTok{), }\AttributeTok{color=}\StringTok{\textquotesingle{}white\textquotesingle{}}\NormalTok{, }\AttributeTok{background =} \StringTok{\textquotesingle{}blue\textquotesingle{}}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
+\begin{table}
 
-\begin{tabular}{l|r|r|r|r}
+\caption{\label{tab:variable-select}Statistical significance of the variables using a negative binomial model}
+\centering
+\begin{tabular}[t]{l|r|r}
 \hline
-  & Estimate & Std. Error & z value & Pr(>|z|)\\
+  & Estimate & Pr(>|z|)\\
 \hline
-(Intercept) & -4.4766626 & 0.6791361 & -6.5917022 & 0.0000000\\
+(Intercept) & -4.4766626 & 0.0000000\\
 \hline
-EthnicityW & -0.0786114 & 0.1576156 & -0.4987540 & 0.6179527\\
+EthnicityW & -0.0786114 & 0.6179527\\
 \hline
-MaritalStatusM & 0.1142920 & 0.4681139 & 0.2441542 & 0.8071114\\
+MaritalStatusM & 0.1142920 & 0.8071114\\
 \hline
-MaritalStatusS & 0.5011754 & 0.3203698 & 1.5643657 & 0.1177317\\
+MaritalStatusS & 0.5011754 & 0.1177317\\
 \hline
-Age & 0.0188481 & 0.0156143 & 1.2071011 & 0.2273932\\
+Age & 0.0188481 & 0.2273932\\
 \hline
-\cellcolor{blue}{\textcolor{white}{YearsSchool}} & \cellcolor{blue}{\textcolor{white}{-0.1689015}} & \cellcolor{blue}{\textcolor{white}{0.0442657}} & \cellcolor{blue}{\textcolor{white}{-3.8156308}} & \cellcolor{blue}{\textcolor{white}{0.0001358}}\\
+\cellcolor{blue}{\textcolor{white}{YearsSchool}} & \cellcolor{blue}{\textcolor{white}{-0.1689015}} & \cellcolor{blue}{\textcolor{white}{0.0001358}}\\
 \hline
-InitInfect2 & -0.3302518 & 0.1740868 & -1.8970524 & 0.0578210\\
+InitInfect2 & -0.3302518 & 0.0578210\\
 \hline
-InitInfect3 & -0.3318821 & 0.1755787 & -1.8902183 & 0.0587288\\
+InitInfect3 & -0.3318821 & 0.0587288\\
 \hline
-NumPartners & 0.1164568 & 0.0598373 & 1.9462257 & 0.0516276\\
+NumPartners & 0.1164568 & 0.0516276\\
 \hline
-OralSex12m1 & -0.3703474 & 0.2387666 & -1.5510855 & 0.1208812\\
+OralSex12m1 & -0.3703474 & 0.1208812\\
 \hline
-OralSex30d1 & -0.3246975 & 0.2643311 & -1.2283739 & 0.2193066\\
+OralSex30d1 & -0.3246975 & 0.2193066\\
 \hline
-RectalSex12m1 & 0.0669703 & 0.4881503 & 0.1371920 & 0.8908790\\
+RectalSex12m1 & 0.0669703 & 0.8908790\\
 \hline
-RectalSex30d1 & -0.1627456 & 0.6172379 & -0.2636675 & 0.7920361\\
+RectalSex30d1 & -0.1627456 & 0.7920361\\
 \hline
-AbPain1 & 0.2969178 & 0.1771403 & 1.6761734 & 0.0937042\\
+AbPain1 & 0.2969178 & 0.0937042\\
 \hline
-SignDischarge1 & 0.1330009 & 0.1306664 & 1.0178660 & 0.3087416\\
+SignDischarge1 & 0.1330009 & 0.3087416\\
 \hline
-SignDysuria1 & 0.1954606 & 0.1812469 & 1.0784219 & 0.2808455\\
+SignDysuria1 & 0.1954606 & 0.2808455\\
 \hline
-CondomUse2 & -0.1553543 & 0.2725108 & -0.5700849 & 0.5686201\\
+CondomUse2 & -0.1553543 & 0.5686201\\
 \hline
-CondomUse3 & -0.4582270 & 0.2819913 & -1.6249684 & 0.1041693\\
+CondomUse3 & -0.4582270 & 0.1041693\\
 \hline
-SignItch1 & -0.2209724 & 0.1750560 & -1.2622958 & 0.2068424\\
+SignItch1 & -0.2209724 & 0.2068424\\
 \hline
-SignLesion1 & -0.2541307 & 0.3787052 & -0.6710513 & 0.5021878\\
+SignLesion1 & -0.2541307 & 0.5021878\\
 \hline
-SignRash1 & -0.0638066 & 0.4592994 & -0.1389215 & 0.8895122\\
+SignRash1 & -0.0638066 & 0.8895122\\
 \hline
-SignLymph1 & 0.2368538 & 0.5922357 & 0.3999317 & 0.6892069\\
+SignLymph1 & 0.2368538 & 0.6892069\\
 \hline
-\cellcolor{blue}{\textcolor{white}{InvVagAtExam1}} & \cellcolor{blue}{\textcolor{white}{0.5726933}} & \cellcolor{blue}{\textcolor{white}{0.2003764}} & \cellcolor{blue}{\textcolor{white}{2.8580874}} & \cellcolor{blue}{\textcolor{white}{0.0042620}}\\
+\cellcolor{blue}{\textcolor{white}{InvVagAtExam1}} & \cellcolor{blue}{\textcolor{white}{0.5726933}} & \cellcolor{blue}{\textcolor{white}{0.0042620}}\\
 \hline
-\cellcolor{blue}{\textcolor{white}{DischargeExam1}} & \cellcolor{blue}{\textcolor{white}{-0.5805191}} & \cellcolor{blue}{\textcolor{white}{0.2691414}} & \cellcolor{blue}{\textcolor{white}{-2.1569301}} & \cellcolor{blue}{\textcolor{white}{0.0310111}}\\
+\cellcolor{blue}{\textcolor{white}{DischargeExam1}} & \cellcolor{blue}{\textcolor{white}{-0.5805191}} & \cellcolor{blue}{\textcolor{white}{0.0310111}}\\
 \hline
-AbnormNodeExam1 & 0.0801562 & 0.5157541 & 0.1554155 & 0.8764938\\
+AbnormNodeExam1 & 0.0801562 & 0.8764938\\
 \hline
 \end{tabular}
+\end{table}
 
-Finally, the vaginal involvement at exam (\texttt{InvVagAtExam}) and the discharge at exam (\texttt{DischargeExam}) are selected as variables in our analysis, since they are shown as statistically significant in \ref{tab:variable-select}.
+Finally, the vaginal involvement at exam (\texttt{InvVagAtExam}) and the discharge at exam (\texttt{DischargeExam}) are selected as variables in our analysis, since they are shown as statistically significant in Table \ref{tab:variable-select}.
 
 \hypertarget{descriptive-analysis}{%
 \section{Descriptive Analysis}\label{descriptive-analysis}}
 
 In total, the data set contains 24 variables, but, as noted, we have selected only 7 of them in our analysis. Recall that the data set has 877 women. The percentage of right-censored data in the data set is 60.4, which is a relatively large part of the data set. The women where followed for 1529 days, then the study was stopped.
 
-\includegraphics{practical_files/figure-latex/EDA-plots-1.pdf}
-
-The three continuous variables we have chosen to use in the analysis are \texttt{Age}, \texttt{YearsSchool} and \texttt{NumPartners}. The correlations between the variables are shown in table \ref{tab:correlations}. Note that the correlation between \texttt{Age} and \texttt{YearsSchool} is 0.43, which means that they are somewhat correlated. This could be interesting to have in mind in the following.
-
-\begin{table}
-
-\caption{\label{tab:correlations}Corr. Between Continuous Variables}
-\centering
-\begin{tabular}[t]{l|c|c|c}
-\hline
-  & Age & YearsSchool & NumPartners\\
-\hline
-Age & 1.0000000 & 0.4316163 & 0.1348591\\
-\hline
-YearsSchool & 0.4316163 & 1.0000000 & 0.0155090\\
-\hline
-NumPartners & 0.1348591 & 0.0155090 & 1.0000000\\
-\hline
-\end{tabular}
-\end{table}
+The three continuous variables we have chosen to use in the analysis are \texttt{Age}, \texttt{YearsSchool} and \texttt{NumPartners}. The correlations between these variables are not significant except between \texttt{Age} and \texttt{YearsSchool} with the value of 0.43. This could be interesting to have in mind in the following.
 
 \hypertarget{nonparametric-analysis}{%
 \section{Nonparametric Analysis}\label{nonparametric-analysis}}
@@ -315,13 +239,13 @@ The median survival time is estimated to be 705 days.
 \hypertarget{comparison-of-survival-curves}{%
 \subsection{Comparison of Survival Curves}\label{comparison-of-survival-curves}}
 
-Below, survival functions are compared by means of the nonparametric logrank test. Note that other types of tests also can be used (Fleming-Harrington family of tests), but we have only used the logrank test in this case. The general \(k\)-sample hypothesis that is tested is
+In Table \ref{tab:pvalues}, survival functions are compared by means of the nonparametric logrank test. Note that other types of tests also can be used (Fleming-Harrington family of tests), but we have only used the logrank test in this case. The general \(k\)-sample hypothesis that is tested is
 
 \begin{equation*}
         H_0: S_1(t) = \ldots = S_k(t), \forall t \leq \tau \text{ vs. } H_1: \text{ some } S_i(t) \neq S_l(t), \text{ for some } t \leq \tau,
 \end{equation*}
 
-where \(\tau\) is the chosen limit of the time of examination and \(k\) varies depending on the levels of the explanatory variable we are testing. \textbf{What about tests on continuous variables, does this make sense as well?} The \(p\)-values from each of the tests are given in table \ref{tab:pvalues}. For instance, choosing a significance level of \(\alpha = 0.05\), we would conclude that reinfection depends on the level of \texttt{CondomUse}, \texttt{InitInfect} and \texttt{InvVagAtExam}, but that there is not enough evidence to conclude that reinfection depends on the level of \texttt{DischargeExam}.
+where \(\tau\) is the chosen limit of the time of examination and \(k\) varies depending on the levels of the explanatory variable we are testing. The \(p\)-values from each of the tests are given in table \ref{tab:pvalues}. For instance, choosing a significance level of \(\alpha = 0.05\), we would conclude that reinfection depends on the level of \texttt{CondomUse}, \texttt{InitInfect} and \texttt{InvVagAtExam}, but that there is not enough evidence to conclude that reinfection depends on the level of \texttt{DischargeExam}.
 
 \begin{table}
 
@@ -340,41 +264,17 @@ p-values & 0.0132506 & 0.0145266 & 0.0068009 & 0.0558044\\
 \section{Fit of a parametric survival model}\label{fit-of-a-parametric-survival-model}}
 
 After trying to fit Weibull, log-logistic and lognormal log-linear models, we concluded that the Weibull model is best suited to our data.
-\textbf{Should we have some interaction terms as well? Could be interesting! There are some significant interactions in both parametric and semi-parametric models, so this could be interesting I think! Then the interpretations need to be explained further also (the interaction terms are explained a bit differently).}
-
-\begin{verbatim}
-#> 
-#> Call:
-#> survreg(formula = s2 ~ ., data = final.data, dist = "weibull")
-#>                  Value Std. Error     z       p
-#> (Intercept)     3.9516     0.6338  6.23 4.5e-10
-#> Age             0.0101     0.0161  0.63 0.52912
-#> NumPartners    -0.0139     0.0681 -0.20 0.83835
-#> CondomUse2      0.0788     0.2995  0.26 0.79244
-#> CondomUse3      0.4228     0.3106  1.36 0.17350
-#> YearsSchool     0.1704     0.0487  3.50 0.00047
-#> InitInfect2     0.5110     0.1907  2.68 0.00738
-#> InitInfect3     0.3149     0.1915  1.64 0.10011
-#> InvVagAtExam1  -0.5092     0.2212 -2.30 0.02133
-#> DischargeExam1  0.4601     0.2894  1.59 0.11184
-#> Log(scale)      0.2606     0.0445  5.85 4.9e-09
-#> 
-#> Scale= 1.3 
-#> 
-#> Weibull distribution
-#> Loglik(model)= -2674.9   Loglik(intercept only)= -2697.1
-#>  Chisq= 44.43 on 9 degrees of freedom, p= 1.2e-06 
-#> Number of Newton-Raphson Iterations: 7 
-#> n= 877
-\end{verbatim}
 
 \begin{figure}
-\centering
-\includegraphics{practical_files/figure-latex/weibull-resids-1.pdf}
-\caption{\label{fig:weibull-resids}Residuals of the Weibull Regression Model}
+
+{\centering \includegraphics[width=0.7\linewidth]{practical_files/figure-latex/weibull-resids-1} 
+
+}
+
+\caption{Residuals of the Weibull Regression Model}\label{fig:weibull-resids}
 \end{figure}
 
-As seen in \ref{fig:weibull-resids}, the standard Gumbel distribution seems to fit relatively nicely to the Kaplan-Meier estimate of the residuals, i.e.~it seems like a reasonable choice for the error term \(W\), which indicates that the Weibull is a reasonable model.
+As seen in Figure \ref{fig:weibull-resids}, the standard Gumbel distribution seems to fit relatively nicely to the Kaplan-Meier estimate of the residuals, i.e.~it seems like a reasonable choice for the error term \(W\), which indicates that the Weibull is a reasonable model.
 
 \begin{figure}
 \centering
@@ -382,7 +282,7 @@ As seen in \ref{fig:weibull-resids}, the standard Gumbel distribution seems to f
 \caption{\label{fig:cumhaz-plot}Cumulative hazard plots comparison}
 \end{figure}
 
-The probability plots in \ref{fig:cumhaz-plot} also show that the Weibull is the better parametric model for the data, because the log-logistic and lognormal models clearly do not fit the line in the tails.
+The probability plots in Figure \ref{fig:cumhaz-plot} also show that the Weibull is the better parametric model for the data, because the log-logistic and lognormal models clearly do not fit the line in the tails.
 
 \hypertarget{interpretation}{%
 \subsection{Interpretation}\label{interpretation}}
@@ -421,7 +321,7 @@ In this case, the model fit gives the scale \(\hat{\sigma} \approx\) 1.298. Thes
 
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-3}Parameter Estimates, AF and HR for each Parameter Estimate}
+\caption{\label{tab:unnamed-chunk-1}Parameter Estimates, AF and HR for each Parameter Estimate}
 \centering
 \begin{tabular}[t]{l|r|r|r}
 \hline
@@ -450,29 +350,44 @@ DischargeExam1 & 0.4601294 & 0.6312020 & 0.7014676\\
 \end{tabular}
 \end{table}
 
-Consider an example using the covariate \texttt{CondomUse} when explaining the interpretation of the covariates in terms of the AF. From the table above it is apparent that the AF of \texttt{CondomUse3} versus \texttt{CondomUse1} is \(\approx\) 0.655. This means that the reinfection time for a person that never uses a condom is \(\approx\) 0.655 times the reinfection time for a person that always uses a condom \textbf{Not sure that this makes sense!? I think it makes sense with the coefficient value given from the model above, but does not make sense in real life, as this suggests that not using a condom is protective!} The interpretation in terms of the AF is similar when considering the other covariates, except for when considering the \texttt{Age} and \texttt{NumPartners}, which is not categorical \textbf{Perhaps it indeed makes sense to considering the Age in this way also, even though it is weird to treat the Age this way?}
-
-\textbf{Here I have assumed that the relative hazards is the same as the hazard ratio?? IS THIS CORRECT?! I think so! Looks like the values make sense with the results from the Cox-model below!}
+Consider an example using the covariate \texttt{CondomUse} when explaining the interpretation of the covariates in terms of the AF. From the table above it is apparent that the AF of \texttt{CondomUse3} versus \texttt{CondomUse1} is \(\approx\) 0.655. This means that the reinfection time for a person that never uses a condom is \(\approx\) 0.655 times the reinfection time for a person that always uses a condom. However as we've seen in \ref{tab:variable-select}, the use of a condom was not statistically significant for this study, so it is uncertain to make conclusions such as this.
+The interpretation in terms of the AF is similar when considering the other covariates, except for when considering the \texttt{Age} and \texttt{NumPartners}, which is not categorical.
 
 Similarly, an example can be used to explain the interpretation of the covariates in terms of the relative hazard. From the table it is apparent that the hazard of \texttt{CondomUse3} relative to \texttt{CondomUse1} is \(\approx\) 0.722. This means that the instantaneous risk of reinfection for a person that never uses a condom is \(\approx\) 0.722 times the instantaneous risk of a person that always uses a condom. Similar interpretations can be done with the other covariates.
 
 \hypertarget{fit-of-a-semi-parametric-survival-model}{%
 \section{Fit of a semi-parametric survival model}\label{fit-of-a-semi-parametric-survival-model}}
 
-The proportional hazards model is fit below.
+The proportional hazards model's fit is shown in Table \ref{tab:Cox-model}.
 
-\begin{verbatim}
-#>                       coef exp(coef)   se(coef)          z     Pr(>|z|)
-#> Age            -0.00783097 0.9921996 0.01237892 -0.6326050 0.5269915929
-#> NumPartners     0.01119536 1.0112583 0.05248331  0.2133127 0.8310830727
-#> CondomUse2     -0.05519517 0.9463004 0.23121727 -0.2387156 0.8113261078
-#> CondomUse3     -0.33570604 0.7148332 0.23948574 -1.4017788 0.1609813112
-#> YearsSchool    -0.13356369 0.8749717 0.03740282 -3.5709522 0.0003556858
-#> InitInfect2    -0.38680211 0.6792255 0.14648410 -2.6405740 0.0082765721
-#> InitInfect3    -0.23500491 0.7905670 0.14768228 -1.5912871 0.1115449801
-#> InvVagAtExam1   0.40191622 1.4946861 0.17048096  2.3575432 0.0183963138
-#> DischargeExam1 -0.36743845 0.6925059 0.22324601 -1.6458903 0.0997863366
-\end{verbatim}
+\begin{table}
+
+\caption{\label{tab:Cox-model}Cox model coeffiecients}
+\centering
+\begin{tabular}[t]{l|r|r|r|r|r}
+\hline
+  & coef & exp(coef) & se(coef) & z & Pr(>|z|)\\
+\hline
+Age & -0.0078310 & 0.9921996 & 0.0123789 & -0.6326050 & 0.5269916\\
+\hline
+NumPartners & 0.0111954 & 1.0112583 & 0.0524833 & 0.2133127 & 0.8310831\\
+\hline
+CondomUse2 & -0.0551952 & 0.9463004 & 0.2312173 & -0.2387156 & 0.8113261\\
+\hline
+CondomUse3 & -0.3357060 & 0.7148332 & 0.2394857 & -1.4017788 & 0.1609813\\
+\hline
+YearsSchool & -0.1335637 & 0.8749717 & 0.0374028 & -3.5709522 & 0.0003557\\
+\hline
+InitInfect2 & -0.3868021 & 0.6792255 & 0.1464841 & -2.6405740 & 0.0082766\\
+\hline
+InitInfect3 & -0.2350049 & 0.7905670 & 0.1476823 & -1.5912871 & 0.1115450\\
+\hline
+InvVagAtExam1 & 0.4019162 & 1.4946861 & 0.1704810 & 2.3575432 & 0.0183963\\
+\hline
+DischargeExam1 & -0.3674385 & 0.6925059 & 0.2232460 & -1.6458903 & 0.0997863\\
+\hline
+\end{tabular}
+\end{table}
 
 \hypertarget{interpretation-1}{%
 \subsection{Interpretation}\label{interpretation-1}}
@@ -490,14 +405,12 @@ The model parameters \(\beta\) can be interpreted in terms of relative hazards. 
 \hypertarget{analysis-of-residuals}{%
 \subsection{Analysis of Residuals}\label{analysis-of-residuals}}
 
-In this section we will check the Cox-model's goodness-of-fit. \textbf{Not very satisfied with a lot of the GOF I did below, something else we can do also? Check material.}
+In this section we will check the Cox-model's goodness-of-fit. The concordance of the model is 0.6024116 and all three statistical tests give a p-value \textless{} 0.05, by which it can already be argued that the model fits the data well. However, we will also check other assumptions on the residuals.
 
 \hypertarget{proportional-hazards-assumption}{%
 \subsubsection{Proportional Hazards Assumption}\label{proportional-hazards-assumption}}
 
-First of all, the Shoenfeld residuals can be used to check the proportional hazards assumption. The residuals are plotted below. The lines in the plots look relatively straight, which indicates that the proportionality assumption might hold.
-
-\includegraphics{practical_files/figure-latex/unnamed-chunk-4-1.pdf}
+First of all, the Shoenfeld residuals can be used to check the proportional hazards assumption. The residuals are plotted in \ref{fig:graphical-analysis}. The lines in the plots look relatively straight, which indicates that the proportionality assumption might hold.
 
 \begin{table}
 
@@ -528,11 +441,9 @@ GLOBAL & 11.8922549 & 9 & 0.2194519\\
 
 The hypothesis test for the proportionality assumption on each of the covariates is applied above. As the table shows, all \(p\)-values are large compared to any reasonable significance level, which means that we do not reject the null hypothesis and we can conclude that the property of proportionality of the covariates is reasonably fulfilled.
 
-\textbf{The plots or table above might need to be removed later, but we will see in the end.}
-
-\textbf{DO THE ANALYTIC CHECK AND/OR GRAPHICAL CHECK THAT THEY TALK ABOUT IN THE SLIDES ALSO?}
-
-\includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-1} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-2} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-3} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-4} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-5} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-6} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-7}
+\begin{figure}
+\includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-1} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-2} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-3} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-4} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-5} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-6} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-7} \caption{Graphical analysis for proportional hazards assumption}\label{fig:graphical-analysis}
+\end{figure}
 
 In the plots above it is noticeable that they all show a horizontal line which confirms the numerical analysis from \ref{tab:schoenfeld-table}.
 
@@ -544,69 +455,46 @@ Secondly, we can check if there are any influential observations using residuals
 From the plots above, it becomes apparent that there clearly are some influential observations for each of the covariates.
 
 \begin{verbatim}
-#>     ObsNum Ethnicity MaritalStatus Age YearsSchool InitInfect NumPartners
-#> 4        4         B             S  43          12          3           1
-#> 11      11         B             D  32          12          3           6
-#> 154    154         B             D  28          11          2           1
-#> 221    221         B             S  18          11          1           1
-#> 366    366         W             S  14           9          1           1
-#> 498    498         B             M  44          11          3           1
-#> 525    525         B             S  15           8          3           1
-#> 574    574         B             D  36          12          3          19
-#> 831    831         W             S  20          12          2          10
-#>     OralSex12m OralSex30d RectalSex12m RectalSex30d AbPain SignDischarge
-#> 4            0          0            0            0      0             0
-#> 11           1          1            0            0      1             1
-#> 154          1          1            0            0      0             0
-#> 221          1          1            1            1      0             0
-#> 366          0          0            0            0      0             0
-#> 498          0          0            0            0      0             0
-#> 525          1          1            0            0      0             1
-#> 574          1          1            0            0      1             1
-#> 831          1          1            1            1      0             1
-#>     SignDysuria CondomUse SignItch SignLesion SignRash SignLymph InvVagAtExam
-#> 4             0         1        0          0        0         0            0
-#> 11            0         2        0          0        0         0            1
-#> 154           0         2        0          0        0         0            0
-#> 221           0         1        0          0        0         0            0
-#> 366           1         2        0          0        0         0            0
-#> 498           0         3        0          0        0         0            0
-#> 525           0         3        0          0        0         0            1
-#> 574           0         1        1          0        0         0            0
-#> 831           0         2        1          0        0         0            1
-#>     DischargeExam AbnormNodeExam Reinfection TimeUntilReinf
-#> 4               1              0           1             54
-#> 11              1              0           0           1468
-#> 154             0              0           0            880
-#> 221             1              0           0           1481
-#> 366             1              0           0           1439
-#> 498             1              0           1             42
-#> 525             1              0           0           1005
-#> 574             1              0           1             43
-#> 831             0              0           0           1027
+#>     Age NumPartners CondomUse YearsSchool InitInfect InvVagAtExam DischargeExam
+#> 4    43           1         1          12          3            0             1
+#> 11   32           6         2          12          3            1             1
+#> 154  28           1         2          11          2            0             0
+#> 221  18           1         1          11          1            0             1
+#> 366  14           1         2           9          1            0             1
+#> 498  44           1         3          11          3            0             1
+#> 525  15           1         3           8          3            1             1
+#> 574  36          19         1          12          3            0             1
+#> 831  20          10         2          12          2            1             0
+#>     Reinfection TimeUntilReinf
+#> 4             1             54
+#> 11            0           1468
+#> 154           0            880
+#> 221           0           1481
+#> 366           0           1439
+#> 498           1             42
+#> 525           0           1005
+#> 574           1             43
+#> 831           0           1027
 \end{verbatim}
 
 By plotting the residuals it was possible to identify as influential observations the individuals with observation numbers: 4, 11, 154, 221, 366, 525, 574, 831. Individuals 4, 498 and 574 showed an unexpectedly short time until reinfection, especially for individuals of their age (older than 40).
-Whereas the other individuals exhibit a much greater time until reinfection, with almost all of them having more than 1000 days until the event.
+Whereas the other individuals exhibit a much greater observation time and no reinfection (right censored), with almost all of them having more than 1000 days, even if they have risk factors such as high number of partners for individual 11 and 831, involvement vagina at exam as 525 and 11 or a low value for years in school.
 
 \hypertarget{linear-covariates-assumption}{%
 \subsubsection{Linear Covariates Assumption}\label{linear-covariates-assumption}}
 
 Thirdly, the the linear assumption of the continuous variables \texttt{Age}, \texttt{NumPartners} and \texttt{YearsSchool} is checked.
 
-\includegraphics{practical_files/figure-latex/unnamed-chunk-7-1.pdf}
+\begin{figure}
+\centering
+\includegraphics{practical_files/figure-latex/linearcovs-1.pdf}
+\caption{\label{fig:linearcovs}Linear covariates graphical analysis}
+\end{figure}
 
-As can be seen from the plots above, the linear assumption of age seems to hold just fine, while the linear assumption for the two other continuous covariates is more uncertain if holds based on the smoother, which is not flat at all.
+As can be seen in Figure \ref{fig:linearcovs}, the linear assumption of age seems to hold just fine, while the linear assumption for the two other continuous covariates is more uncertain if holds based on the smoother, which is not flat at all.
 
-\textbf{Perhaps these plots need to be removed as well? This part of the GOF is perhaps not as important either way. :( Hard to do the GOF-checks without plots perhaps, but I don't think these plots are the most important in the report.}
-
-\hypertarget{martingale-residuals-can-be-used-for-global-fit-not-sure-how}{%
-\subsubsection{Martingale Residuals (Can be used for global fit? Not sure how)}\label{martingale-residuals-can-be-used-for-global-fit-not-sure-how}}
-
-\includegraphics{practical_files/figure-latex/unnamed-chunk-8-1.pdf}
-
-\hypertarget{conclusions-add-more-later-probably.-also-clean-up-text.}{%
-\section{Conclusions (ADD MORE LATER PROBABLY. Also clean up text.)}\label{conclusions-add-more-later-probably.-also-clean-up-text.}}
+\hypertarget{conclusions}{%
+\section{Conclusions}\label{conclusions}}
 
 Assuming that the parametric and semi-parametric models can be trusted, the data analysis has uncovered some possible protective factors and risk-factors for reinfection with gonorrhea or chlamydia in women who had suffered one of both infections previously.
 

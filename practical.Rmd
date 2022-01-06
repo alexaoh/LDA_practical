@@ -71,48 +71,30 @@ Naturally, the categorical variable which states if the woman is reinfected or n
 
 As noted, in addition to medical criteria for selecting variables, we have used a negative binomial model to discover which variables are statistically significant to the event of reinfection. The negative binomial model can be fitted when the occurence of events is a count for each patient, as described in [this article](https://pubmed.ncbi.nlm.nih.gov/22083507/). Thereby including all the variables in the model and converting the time into an offset since we are comparing counts for different follow-up times (a person that has been in the study longer would have higher chances of getting reinfected).
 
-REMOVE THIS AFTER: I made a list of things that can be used in the explanation:
-
 * Despite the fact that the age of the woman is found to not be statistically significant in the method above, we have added it because of the mentioned studies (this is thus added based on medical criteria)
 
-```{r variable-select, echo = T, fig.cap='Statistical significance of the variables using a negative binomial model'}
+```{r variable-select}
 nb.model <- MASS::glm.nb(Reinfection ~ Ethnicity + MaritalStatus + Age + YearsSchool 
           + InitInfect + NumPartners +OralSex12m + OralSex30d + RectalSex12m 
           + RectalSex30d + AbPain + SignDischarge + SignDysuria + CondomUse 
           + SignItch + SignLesion + SignRash + SignLymph + InvVagAtExam 
           + DischargeExam + AbnormNodeExam + offset(log(TimeUntilReinf)),
               data=std_data)
-p.model <- glm(Reinfection ~ Ethnicity + MaritalStatus + Age + YearsSchool 
-          + InitInfect + NumPartners +OralSex12m + OralSex30d + RectalSex12m 
-          + RectalSex30d + AbPain + SignDischarge + SignDysuria + CondomUse 
-          + SignItch + SignLesion + SignRash + SignLymph + InvVagAtExam 
-          + DischargeExam + AbnormNodeExam + offset(log(TimeUntilReinf)),
-              data=std_data, family = poisson())
 s <- summary(nb.model)
-k <- knitr::kable(s$coefficients)
+k <- knitr::kable(s$coefficients[,c(-2,-3)], caption = 'Statistical significance of the variables using a negative binomial model')
 kableExtra::row_spec(k, c(6,23,24), color='white', background = 'blue')
 ```
 
-Finally, the vaginal involvement at exam (`InvVagAtExam`) and the discharge at exam (`DischargeExam`) are selected as variables in our analysis, since they are shown as statistically significant in \@ref(tab:variable-select). 
+Finally, the vaginal involvement at exam (`InvVagAtExam`) and the discharge at exam (`DischargeExam`) are selected as variables in our analysis, since they are shown as statistically significant in Table \@ref(tab:variable-select). 
 
 # Descriptive Analysis
 
 In total, the data set contains `r dim(std_data)[[2]]` variables, but, as noted, we have selected only 7 of them in our analysis. Recall that the data set has `r dim(std_data)[[1]]` women. The percentage of right-censored data in the data set is `r round( dim(std_data[std_data$Reinfection == 0,])[[1]]/dim(std_data)[[1]]*100, 1)`, which is a relatively large part of the data set. The women where followed for `r max(std_data$TimeUntilReinf)` days, then the study was stopped. 
 
-```{r EDA-plots, fig.height=5.5}
-par(mfrow = c(3,3))
-hist(final.data[, "Age"], breaks = 100, main= "Age", xlab = "Age")
-hist(final.data[, "YearsSchool"], breaks = 100, main = "YearsSchool", xlab = "YearsSchool")
-hist(final.data[, "NumPartners"], breaks = 100, main = "NumPartners", xlab = "NumPartners")
-barplot(height = table(final.data %>% dplyr::select(CondomUse)), main = "Counts of CondomUse")
-barplot(height = table(final.data %>% dplyr::select(InitInfect)), main = "Counts of InitInfect")
-barplot(height = table(final.data %>% dplyr::select(InvVagAtExam)), main = "Counts of InvVagAtExam")
-barplot(height = table(final.data %>% dplyr::select(DischargeExam)), main = "Counts of DischargeExam")
-```
 
-The three continuous variables we have chosen to use in the analysis are `Age`, `YearsSchool` and `NumPartners`. The correlations between the variables are shown in table \@ref(tab:correlations). Note that the correlation between `Age` and `YearsSchool` is `r round(cor(std_data$Age, std_data$YearsSchool), 2)`, which means that they are somewhat correlated. This could be interesting to have in mind in the following. 
+The three continuous variables we have chosen to use in the analysis are `Age`, `YearsSchool` and `NumPartners`. The correlations between these variables are not significant except between `Age` and `YearsSchool` with the value of `r round(cor(std_data$Age, std_data$YearsSchool), 2)`. This could be interesting to have in mind in the following. 
 
-```{r correlations}
+```{r correlations, include=F}
 correlations <- cor(final.data %>% dplyr::select(Age, YearsSchool, NumPartners))
 knitr::kable(correlations, align = "c", caption = "Corr. Between Continuous Variables", label = "correlations")
 ```
@@ -146,36 +128,19 @@ s1.DischargeExam <- with(std_data, Surv(TimeUntilReinf, Reinfection) ~ Discharge
 s1.YearsSchool <- with(std_data, Surv(TimeUntilReinf, Reinfection) ~ YearsSchool)
 ```
 
-```{r, include = F}
-# Plot all survival curves to make sure that we make sound conclusions! Plot the rest as well!
-s1fit.CondomUse <- survfit(s1.CondomUse)
-par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
-plot(s1fit.CondomUse, col = c(1,2,3), xlab = "Time to reinfection [days]",
-     ylab = expression(bolditalic(hat(S)(t))),
-     yaxs = "i", xaxs = "i", bty = "n", lty = c(1,2,3), lwd = rep(3, length.out = 3),
-     conf.int = F)
-legend("topright", legend = levels(std_data$CondomUse), title = "Condom Use",
-       bty = "n", col = c(1,2,3), lty = c(1,2,3), lwd = rep(3, length.out = 3))
-title("Survival Function as Function of Condom Use")
-
-
-# Continuous variables - does it make sense?
-s1fit.YearsSchool <- survfit(s1.YearsSchool)
-```
-
 The median survival time is estimated to be `r summary(s1fit)$table["median"][[1]]` days.
 
 ## Comparison of Survival Curves
  
-Below, survival functions are compared by means of the nonparametric logrank test. Note that other types of tests also can be used (Fleming-Harrington family of tests), but we have only used the logrank test in this case. The general $k$-sample hypothesis that is tested is 
+In Table \@ref(tab:pvalues), survival functions are compared by means of the nonparametric logrank test. Note that other types of tests also can be used (Fleming-Harrington family of tests), but we have only used the logrank test in this case. The general $k$-sample hypothesis that is tested is 
 
 \begin{equation*}
         H_0: S_1(t) = \ldots = S_k(t), \forall t \leq \tau \text{ vs. } H_1: \text{ some } S_i(t) \neq S_l(t), \text{ for some } t \leq \tau,
 \end{equation*}
 
-where $\tau$ is the chosen limit of the time of examination and $k$ varies depending on the levels of the explanatory variable we are testing. **What about tests on continuous variables, does this make sense as well?** The $p$-values from each of the tests are given in table \@ref(tab:pvalues). For instance, choosing a significance level of $\alpha = 0.05$, we would conclude that reinfection depends on the level of `CondomUse`, `InitInfect` and `InvVagAtExam`, but that there is not enough evidence to conclude that reinfection depends on the level of `DischargeExam`.
+where $\tau$ is the chosen limit of the time of examination and $k$ varies depending on the levels of the explanatory variable we are testing. The $p$-values from each of the tests are given in table \@ref(tab:pvalues). For instance, choosing a significance level of $\alpha = 0.05$, we would conclude that reinfection depends on the level of `CondomUse`, `InitInfect` and `InvVagAtExam`, but that there is not enough evidence to conclude that reinfection depends on the level of `DischargeExam`.
 
-```{r}
+```{r logrank-test}
 cUseTest <- FHtestrcc(s1.CondomUse)
 InitTest <- FHtestrcc(s1.InitInfect)
 InvVagTest <- FHtestrcc(s1.InvVagAtExam)
@@ -193,9 +158,8 @@ knitr::kable(pvalues, align = "c", caption = "p-values from logrank tests", labe
 # Fit of a parametric survival model
 
 After trying to fit Weibull, log-logistic and lognormal log-linear models, we concluded that the Weibull model is best suited to our data.
-**Should we have some interaction terms as well? Could be interesting! There are some significant interactions in both parametric and semi-parametric models, so this could be interesting I think! Then the interpretations need to be explained further also (the interaction terms are explained a bit differently).**
 
-```{r fit-weibull}
+```{r fit-weibull, include=F}
 s2 <- with(std_data, Surv(TimeUntilReinf, Reinfection))
 weibull.full  <- survreg(s2 ~ ., data = final.data, dist = "weibull")
 # Can add all two-way interactions below. 
@@ -203,7 +167,7 @@ weibull.full  <- survreg(s2 ~ ., data = final.data, dist = "weibull")
 (s.weibull <- summary(weibull.full))
 ```
 
-```{r weibull-resids, fig.cap='Residuals of the Weibull Regression Model'}
+```{r weibull-resids, fig.cap='Residuals of the Weibull Regression Model', out.width='70%', fig.align='center'}
 weibull.pred <- predict(weibull.full, type = "linear")
 resids.weibull <- (log(std_data$TimeUntilReinf) - weibull.pred) / weibull.full$scale
 par(font = 2, font.axis = 2, font.lab = 2, las = 1, mar = c(5, 5, 4, 2))
@@ -219,7 +183,7 @@ legend("bottomleft", c("KM estimate", "95% - CI", "Stand. Gumbel Distribution"),
        col = c(1, 2, 3), lty = c(1, 2, 1), lwd = 3, bty = "n")
 ```
 
-As seen in \@ref(fig:weibull-resids), the standard Gumbel distribution seems to fit relatively nicely to the Kaplan-Meier estimate of the residuals, i.e. it seems like a reasonable choice for the error term $W$, which indicates that the Weibull is a reasonable model. 
+As seen in Figure \@ref(fig:weibull-resids), the standard Gumbel distribution seems to fit relatively nicely to the Kaplan-Meier estimate of the residuals, i.e. it seems like a reasonable choice for the error term $W$, which indicates that the Weibull is a reasonable model. 
 
 ```{r fit-lognormal, include= F}
 lognormal.full <- update(weibull.full, dist = "lognormal")
@@ -259,7 +223,7 @@ legend("bottomleft", c("KM estimate", "95% - CI", "Stand. Logistic Distribution"
 cumhazPlot(std_data$TimeUntilReinf, std_data$Reinfection,col = 4, distr = c("wei", "loglo", "lognormal"), font.lab = 4)
 ```
 
-The probability plots in \@ref(fig:cumhaz-plot) also show that the Weibull is the better parametric model for the data, because the log-logistic and lognormal models clearly do not fit the line in the tails. 
+The probability plots in Figure \@ref(fig:cumhaz-plot) also show that the Weibull is the better parametric model for the data, because the log-logistic and lognormal models clearly do not fit the line in the tails. 
 
 ## Interpretation 
 
@@ -301,22 +265,21 @@ df <- data.frame("Parameter Estimate" = s.weibull$coefficients, "AF" = exp(-s.we
 knitr::kable(df, caption = "Parameter Estimates, AF and HR for each Parameter Estimate")
 ```
 
-Consider an example using the covariate `CondomUse` when explaining the interpretation of the covariates in terms of the AF. From the table above it is apparent that the AF of `CondomUse3` versus `CondomUse1` is $\approx$ `r round(exp(-s.weibull$coefficients)["CondomUse3"][[1]], 3)`. This means that the reinfection time for a person that never uses a condom is $\approx$ `r round(exp(-s.weibull$coefficients)["CondomUse3"][[1]], 3)` times the reinfection time for a person that always uses a condom **Not sure that this makes sense!? I think it makes sense with the coefficient value given from the model above, but does not make sense in real life, as this suggests that not using a condom is protective!** The interpretation in terms of the AF is similar when considering the other covariates, except for when considering the `Age` and `NumPartners`, which is not categorical **Perhaps it indeed makes sense to considering the Age in this way also, even though it is weird to treat the Age this way?**
-
-**Here I have assumed that the relative hazards is the same as the hazard ratio?? IS THIS CORRECT?! I think so! Looks like the values make sense with the results from the Cox-model below!**
+Consider an example using the covariate `CondomUse` when explaining the interpretation of the covariates in terms of the AF. From the table above it is apparent that the AF of `CondomUse3` versus `CondomUse1` is $\approx$ `r round(exp(-s.weibull$coefficients)["CondomUse3"][[1]], 3)`. This means that the reinfection time for a person that never uses a condom is $\approx$ `r round(exp(-s.weibull$coefficients)["CondomUse3"][[1]], 3)` times the reinfection time for a person that always uses a condom. However as we've seen in \@ref(tab:variable-select), the use of a condom was not statistically significant for this study, so it is uncertain to make conclusions such as this. 
+The interpretation in terms of the AF is similar when considering the other covariates, except for when considering the `Age` and `NumPartners`, which is not categorical.
 
 Similarly, an example can be used to explain the interpretation of the covariates in terms of the relative hazard. From the table it is apparent that the hazard of `CondomUse3` relative to `CondomUse1` is $\approx$ `r round(exp(-s.weibull$coefficients/s.weibull$scale)["CondomUse3"][[1]], 3)`. This means that the instantaneous risk of reinfection for a person that never uses a condom is $\approx$ `r round(exp(-s.weibull$coefficients/s.weibull$scale)["CondomUse3"][[1]], 3)` times the instantaneous risk of a person that always uses a condom. Similar interpretations can be done with the other covariates. 
 
 # Fit of a semi-parametric survival model
 
-The proportional hazards model is fit below. 
+The proportional hazards model's fit is shown in Table \@ref(tab:Cox-model). 
 
 ```{r Cox-model}
 cox1 <- coxph(s2 ~ ., data = final.data)
 # Can add all two-way interactions below. 
 #cox1 <- coxph(s2 ~ (.)^2, data = final.data)
 s1.cox1 <- summary(cox1)
-s1.cox1$coefficients
+knitr::kable(s1.cox1$coefficients, caption = 'Cox model coeffiecients')
 ```
 
 ## Interpretation
@@ -333,13 +296,13 @@ The model parameters $\beta$ can be interpreted in terms of relative hazards. As
 
 ## Analysis of Residuals 
 
-In this section we will check the Cox-model's goodness-of-fit. **Not very satisfied with a lot of the GOF I did below, something else we can do also? Check material.**
+In this section we will check the Cox-model's goodness-of-fit. The concordance of the model is `r s1.cox1$concordance[[1]]` and all three statistical tests give a p-value < 0.05, by which it can already be argued that the model fits the data well. However, we will also check other assumptions on the residuals.
 
 ### Proportional Hazards Assumption
 
-First of all, the Shoenfeld residuals can be used to check the proportional hazards assumption. The residuals are plotted below. The lines in the plots look relatively straight, which indicates that the proportionality assumption might hold. 
+First of all, the Shoenfeld residuals can be used to check the proportional hazards assumption. The residuals are plotted in \@ref(fig:graphical-analysis). The lines in the plots look relatively straight, which indicates that the proportionality assumption might hold. 
 
-```{r}
+```{r, include=F}
 cox.shoenfeld.test <- cox.zph(cox1)
 par(mfrow = c(2, 4), font = 2, font.lab = 4, font.axis = 2, las = 1,
     cex.lab = 1.3, cex.axis = 1.2)
@@ -352,11 +315,8 @@ knitr::kable(cox.shoenfeld.test$table, caption = "Hypothesis Test for Proportion
 
 The hypothesis test for the proportionality assumption on each of the covariates is applied above. As the table shows, all $p$-values are large compared to any reasonable significance level, which means that we do not reject the null hypothesis and we can conclude that the property of proportionality of the covariates is reasonably fulfilled. 
 
-**The plots or table above might need to be removed later, but we will see in the end.**
 
-**DO THE ANALYTIC CHECK AND/OR GRAPHICAL CHECK THAT THEY TALK ABOUT IN THE SLIDES ALSO?**
-
-```{r graphical-analysis, out.width='32%', fig.show='hold'}
+```{r graphical-analysis, out.width='32%', fig.show='hold', fig.cap='Graphical analysis for proportional hazards assumption'}
 par(mar = c(4, 4, .1, .1))
 plot(cox.shoenfeld.test)
 ```
@@ -381,7 +341,7 @@ for (i in 1:9) {
 
 From the plots above, it becomes apparent that there clearly are some influential observations for each of the covariates. 
 
-```{r}
+```{r infl-obs}
 # influential observations
 # age: 4, 498
 # NumPartners: 11, 574, 831
@@ -393,17 +353,18 @@ From the plots above, it becomes apparent that there clearly are some influentia
 # InvVagAtExam1: 525
 # DischargeExam1: 154, 831
 influential <- c(4,11,154, 221, 366, 498,525, 574, 831)
-std_data[influential,]
+infl.df <- cbind(final.data, std_data[,c(23,24)])
+infl.df[influential,]
 ```
 
 By plotting the residuals it was possible to identify as influential observations the individuals with observation numbers: 4, 11, 154, 221, 366, 525, 574, 831. Individuals 4, 498 and 574 showed an unexpectedly short time until reinfection, especially for individuals of their age (older than 40). 
-Whereas the other individuals exhibit a much greater time until reinfection, with almost all of them having more than 1000 days until the event. 
+Whereas the other individuals exhibit a much greater observation time and no reinfection (right censored), with almost all of them having more than 1000 days, even if they have risk factors such as high number of partners for individual 11 and 831, involvement vagina at exam as 525 and 11 or a low value for years in school. 
 
 ### Linear Covariates Assumption
 
 Thirdly, the the linear assumption of the continuous variables `Age`, `NumPartners` and `YearsSchool` is checked. 
 
-```{r}
+```{r linearcovs, fig.cap='Linear covariates graphical analysis'}
 resids1 <- residuals(update(cox1,  ~ . - Age))
 resids2 <- residuals(update(cox1,  ~ . - NumPartners))
 resids3 <- residuals(update(cox1,  ~ . - YearsSchool))
@@ -421,20 +382,10 @@ abline(h = 0, lwd = 2, lty = 2)
 lines(lowess(final.data$YearsSchool, resids3), lwd = 3)
 ```
 
-As can be seen from the plots above, the linear assumption of age seems to hold just fine, while the linear assumption for the two other continuous covariates is more uncertain if holds based on the smoother, which is not flat at all. 
-
-**Perhaps these plots need to be removed as well? This part of the GOF is perhaps not as important either way. :( Hard to do the GOF-checks without plots perhaps, but I don't think these plots are the most important in the report.**
-
-### Martingale Residuals (Can be used for global fit? Not sure how)
-
-```{r}
-martin <- residuals(cox1, "martingale")
-plot(martin)
-```
+As can be seen in Figure \@ref(fig:linearcovs), the linear assumption of age seems to hold just fine, while the linear assumption for the two other continuous covariates is more uncertain if holds based on the smoother, which is not flat at all. 
 
 
-
-# Conclusions (ADD MORE LATER PROBABLY. Also clean up text.)
+# Conclusions
 
 Assuming that the parametric and semi-parametric models can be trusted, the data analysis has uncovered some possible protective factors and risk-factors for reinfection with gonorrhea or chlamydia in women who had suffered one of both infections previously.
 
