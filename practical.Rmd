@@ -97,6 +97,7 @@ barplot(height = table(final.data %>% dplyr::select(InitInfect)), main = "Counts
 barplot(height = table(final.data %>% dplyr::select(InvVagAtExam)), main = "Counts of InvVagAtExam")
 barplot(height = table(final.data %>% dplyr::select(DischargeExam)), main = "Counts of DischargeExam")
 barplot(height = table(std_data %>% dplyr::select(MaritalStatus)), main = "Counts of MaritalStatus")
+barplot(height = table(std_data %>% dplyr::filter(Reinfection == 1) %>% dplyr::select(TimeUntilReinf)), breaks = 100, main = "TimeUntilReinf (uncensored)", xlab = "TimeUntilReinf")
 ```
 
 The three continuous variables we have chosen to use in the analysis are `Age`, `YearsSchool` and `NumPartners`. The correlations between these variables are not significant except between `Age` and `YearsSchool` with the value of `r round(cor(std_data$Age, std_data$YearsSchool), 2)`. This could be interesting to have in mind in the following. 
@@ -268,7 +269,7 @@ In this case, the model fit gives the scale $\hat{\sigma} \approx$ `r round(s.we
 ```{r Weibull-table, echo = F}
 df <- data.frame("Parameter Estimate" = s.weibull$coefficients, "p" = s.weibull$table[-length(s.weibull$coefficients)-1, 4], "AF" = exp(-s.weibull$coefficients), 
                  "HR" =  exp(-s.weibull$coefficients/s.weibull$scale))
-knitr::kable(df, caption = "Parameter estimates, p-values, AF and HR for each parameter estimate")
+knitr::kable(df, caption = "Parameter estimates, p-values, AF and HR for the Weibull model")
 ```
 
 Consider an example using the covariate `CondomUse` when explaining the interpretation of the covariates in terms of the AF. From the table it is apparent that the AF of `CondomUse3` versus `CondomUse1` is $\approx$ `r round(exp(-s.weibull$coefficients)["CondomUse3"][[1]], 3)`. This means that the reinfection time for a person that never uses a condom is $\approx$ `r round(exp(-s.weibull$coefficients)["CondomUse3"][[1]], 3)` times the reinfection time for a person that always uses a condom. However as we have seen in table \@ref(tab:variable-select), the use of a condom was not statistically significant for this study, so it is uncertain to make conclusions such as this. More importantly, the fitted Weibull model gives large $p$-values for the levels of `CondomUse`, which leads to the same conclusion; that according to these statistical models, evidence of different risk of reinfection for the use of condoms does not exist. The interpretation in terms of the AF is similar when considering the other covariates, except for when considering the `Age` and `NumPartners`, which are not categorical. In these cases we talk about a similar change in the survival, i.e. the reinfection time, for unitary changes in the covariates, when the rest of the profile is kept constant. 
@@ -284,7 +285,7 @@ cox1 <- coxph(s2 ~ ., data = final.data)
 # Can add all two-way interactions below. 
 #cox1 <- coxph(s2 ~ (.)^2, data = final.data)
 s1.cox1 <- summary(cox1)
-knitr::kable(s1.cox1$coefficients, caption = 'Cox model coefficients')
+knitr::kable(s1.cox1$coefficients, caption = 'Cox model fit')
 ```
 
 ## Interpretation
@@ -358,14 +359,13 @@ infl.df <- cbind(final.data, std_data[,c(23,24)])
 infl.df[influential,]
 ```
 
-By plotting the residuals it was possible to identify as influential observations the individuals with observation numbers: 4, 11, 154, 221, 366, 525, 574, 831. Individuals 4, 498 and 574 showed an unexpectedly short time until reinfection, especially for individuals of their age (older than 40). 
-Whereas the other individuals exhibit a much greater observation time and no reinfection (right censored), with almost all of them having more than 1000 days, even if they have risk factors such as high number of partners for individual 11 and 831, involvement vagina at exam as 525 and 11 or a low value for years in school. 
+By plotting the residuals it was possible to identify as influential observations the individuals with observation numbers: 4, 11, 154, 221, 366, 498, 525, 574 and 831. Individuals 4, 498 and 574 showed a short time until reinfection (in fact below the first quantile of reinfection times), all having close to average amount of schooling, `InitInfect3` and `InvVagAtExam0`. The other individuals exhibit a much greater observation time and no reinfection (right censored), with almost all of them having more than 1000 days, even if some of them, e.g. 525 and 11, have `InvVagAtExam1`. 
 
 ### Linear Covariates Assumption
 
-Thirdly, the the linear assumption of the continuous variables `Age`, `NumPartners` and `YearsSchool` is checked. 
+Thirdly, the linear assumption of the continuous variables `Age`, `NumPartners` and `YearsSchool` is checked. This is checked by plotting the residuals from the Cox model when each of the continuous variables are omitted, in addition to a scatter plot smoother. The plots are omitted from the report, but they show that the linear assumption for `Age` seems to hold fine, while the linear assumption for the other two covariates could be deemed as wrong, since the scatter plot smoother is not flat at all. 
 
-```{r linearcovs, fig.cap='Linear covariates graphical analysis'}
+```{r linearcovs, fig.cap='Linear covariates graphical analysis', include = F}
 resids1 <- residuals(update(cox1,  ~ . - Age))
 resids2 <- residuals(update(cox1,  ~ . - NumPartners))
 resids3 <- residuals(update(cox1,  ~ . - YearsSchool))
@@ -383,7 +383,8 @@ abline(h = 0, lwd = 2, lty = 2)
 lines(lowess(final.data$YearsSchool, resids3), lwd = 3)
 ```
 
-As can be seen in figure \@ref(fig:linearcovs), the linear assumption of age seems to hold just fine, while the linear assumption for the two other continuous covariates is more uncertain if holds based on the smoother, which is not flat at all. 
+
+<!-- As can be seen in figure \@ref(fig:linearcovs), the linear assumption of age seems to hold just fine, while the linear assumption for the two other continuous covariates is more uncertain if holds based on the smoother, which is not flat at all.  -->
 
 
 # Conclusions
@@ -392,9 +393,8 @@ Assuming that the parametric and semi-parametric models can be trusted, the data
 
 ## Protective Factors 
 
-The covariates `YearsSchool` and `InitInfect2` (Initial infection of Chlamydia only) are statistically significant to a level $\alpha = 0.05$ in both the parametric and semi-parametric model. Moreover, the logrank tests of the survival curves yield the conclusion that the levels of `InitInfect` yield different survival curve, which supports the conclusion based on the models. Both these covariates are estimated to being protective factors against reinfection. When it comes to the initial infection of Chlamydia, it is estimated to reduce the instantaneous risk compared to a person with Gonorrhea as initial infection by approximately `r round(100-exp(-s.weibull$coefficients/s.weibull$scale)["InitInfect2"][[1]]*100)`\% according to the parametric Weibull model and the Cox-model. Moreover, each unitary increase in `YearsSchool` is estimated to reduce the instantaneous risk by approximately `r round(100-exp(-s.weibull$coefficients/s.weibull$scale)["YearsSchool"][[1]]*100)`\% according to the parametric Weibull model and the Cox-model. Recall that in all these estimations it is assumed that the rest of the profile of each individual is the same, except for the described change. 
+The covariates `YearsSchool` and `InitInfect2` (Initial infection of Chlamydia only) are statistically significant to a level $\alpha = 0.05$ in both the parametric and semi-parametric model. Moreover, the logrank tests of the survival curves yield the conclusion that the levels of `InitInfect` yield different survival curve, which supports the conclusion based on the models. Both these covariates are estimated to being protective factors against reinfection. When it comes to the initial infection of Chlamydia, it is estimated to reduce the instantaneous risk compared to a person with Gonorrhea as initial infection by approximately `r round(100-exp(-s.weibull$coefficients/s.weibull$scale)["InitInfect2"][[1]]*100, 2)`\% according to the parametric Weibull model and the Cox-model. Moreover, each unitary increase in `YearsSchool` is estimated to reduce the instantaneous risk by approximately `r round(100-exp(-s.weibull$coefficients/s.weibull$scale)["YearsSchool"][[1]]*100, 2)`\% according to the parametric Weibull model and the Cox-model. Recall that in all these estimations it is assumed that the rest of the profile of each individual is the same, except for the described change. 
 
 ## Risk-factors 
 
-The covariate `InvVagAtExam1` (yes) is statistically significant to a level $\alpha = 0.05$ in both the parametric and semi-parametric model. Moreover, the logrank test of the survival curves yield the conclusion that the levels of the covariate yields different survival curves, which supports the conclusion based on the models. This is estimated to being a risk factor by both models. It is estimated to increasing the instantaneous risk compared a person not experiencing involvement of vagina at exam (with identical profile except for this change) by approximately `r round(-100+exp(-s.weibull$coefficients/s.weibull$scale)["InvVagAtExam1"][[1]]*100)`\%, when selecting the slightly more optimistic estimate of the Weibull model instead of the more pessimistic estimate from the Cox model `r round(-100+s1.cox1$coefficients[, 2]["InvVagAtExam1"][[1]]*100)`\%.
-
+The covariate `InvVagAtExam1` (yes) is statistically significant to a level $\alpha = 0.05$ in both the parametric and semi-parametric model. Moreover, the logrank test of the survival curves yield the conclusion that the levels of the covariate yields different survival curves, which supports the conclusion based on the models. This is estimated to being a risk factor by both models. It is estimated to increasing the instantaneous risk compared a person not experiencing involvement of vagina at exam (with identical profile except for this change) by approximately `r round(-100+exp(-s.weibull$coefficients/s.weibull$scale)["InvVagAtExam1"][[1]]*100, 2)`\%, when selecting the slightly more optimistic estimate of the Weibull model instead of the more pessimistic estimate from the Cox model `r round(-100+s1.cox1$coefficients[, 2]["InvVagAtExam1"][[1]]*100, 2)`\%.

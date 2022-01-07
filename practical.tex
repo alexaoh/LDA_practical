@@ -319,7 +319,7 @@ In this case, the model fit gives the scale \(\hat{\sigma} \approx\) 1.298. Thes
 
 \begin{table}
 
-\caption{\label{tab:Weibull-table}Parameter estimates, p-values, AF and HR for each parameter estimate}
+\caption{\label{tab:Weibull-table}Parameter estimates, p-values, AF and HR for the Weibull model}
 \centering
 \begin{tabular}[t]{l|r|r|r|r}
 \hline
@@ -359,7 +359,7 @@ The fit of the proportional hazards model is shown in table \ref{tab:Cox-model}.
 
 \begin{table}
 
-\caption{\label{tab:Cox-model}Cox model coefficients}
+\caption{\label{tab:Cox-model}Cox model fit}
 \centering
 \begin{tabular}[t]{l|r|r|r|r|r}
 \hline
@@ -470,21 +470,12 @@ Secondly, we can check if there are any influential observations using residuals
 #> 831           0           1027
 \end{verbatim}
 
-By plotting the residuals it was possible to identify as influential observations the individuals with observation numbers: 4, 11, 154, 221, 366, 525, 574, 831. Individuals 4, 498 and 574 showed an unexpectedly short time until reinfection, especially for individuals of their age (older than 40).
-Whereas the other individuals exhibit a much greater observation time and no reinfection (right censored), with almost all of them having more than 1000 days, even if they have risk factors such as high number of partners for individual 11 and 831, involvement vagina at exam as 525 and 11 or a low value for years in school.
+By plotting the residuals it was possible to identify as influential observations the individuals with observation numbers: 4, 11, 154, 221, 366, 498, 525, 574 and 831. Individuals 4, 498 and 574 showed a short time until reinfection (in fact below the first quantile of reinfection times), all having close to average amount of schooling, \texttt{InitInfect3} and \texttt{InvVagAtExam0}. The other individuals exhibit a much greater observation time and no reinfection (right censored), with almost all of them having more than 1000 days, even if some of them, e.g.~525 and 11, have \texttt{InvVagAtExam1}.
 
 \hypertarget{linear-covariates-assumption}{%
 \subsubsection{Linear Covariates Assumption}\label{linear-covariates-assumption}}
 
-Thirdly, the the linear assumption of the continuous variables \texttt{Age}, \texttt{NumPartners} and \texttt{YearsSchool} is checked.
-
-\begin{figure}
-\centering
-\includegraphics{practical_files/figure-latex/linearcovs-1.pdf}
-\caption{\label{fig:linearcovs}Linear covariates graphical analysis}
-\end{figure}
-
-As can be seen in figure \ref{fig:linearcovs}, the linear assumption of age seems to hold just fine, while the linear assumption for the two other continuous covariates is more uncertain if holds based on the smoother, which is not flat at all.
+Thirdly, the linear assumption of the continuous variables \texttt{Age}, \texttt{NumPartners} and \texttt{YearsSchool} is checked. This is checked by plotting the residuals from the Cox model when each of the continuous variables are omitted, in addition to a scatter plot smoother. The plots are omitted from the report, but they show that the linear assumption for \texttt{Age} seems to hold fine, while the linear assumption for the other two covariates could be deemed as wrong, since the scatter plot smoother is not flat at all.
 
 \hypertarget{conclusions}{%
 \section{Conclusions}\label{conclusions}}
@@ -494,11 +485,11 @@ Assuming that the parametric and semi-parametric models can be trusted, the data
 \hypertarget{protective-factors}{%
 \subsection{Protective Factors}\label{protective-factors}}
 
-The covariates \texttt{YearsSchool} and \texttt{InitInfect2} (Initial infection of Chlamydia only) are statistically significant to a level \(\alpha = 0.05\) in both the parametric and semi-parametric model. Moreover, the logrank tests of the survival curves yield the conclusion that the levels of \texttt{InitInfect} yield different survival curve, which supports the conclusion based on the models. Both these covariates are estimated to being protective factors against reinfection. When it comes to the initial infection of Chlamydia, it is estimated to reduce the instantaneous risk compared to a person with Gonorrhea as initial infection by approximately 33\% according to the parametric Weibull model and the Cox-model. Moreover, each unitary increase in \texttt{YearsSchool} is estimated to reduce the instantaneous risk by approximately 12\% according to the parametric Weibull model and the Cox-model. Recall that in all these estimations it is assumed that the rest of the profile of each individual is the same, except for the described change.
+The covariates \texttt{YearsSchool} and \texttt{InitInfect2} (Initial infection of Chlamydia only) are statistically significant to a level \(\alpha = 0.05\) in both the parametric and semi-parametric model. Moreover, the logrank tests of the survival curves yield the conclusion that the levels of \texttt{InitInfect} yield different survival curve, which supports the conclusion based on the models. Both these covariates are estimated to being protective factors against reinfection. When it comes to the initial infection of Chlamydia, it is estimated to reduce the instantaneous risk compared to a person with Gonorrhea as initial infection by approximately 32.55\% according to the parametric Weibull model and the Cox-model. Moreover, each unitary increase in \texttt{YearsSchool} is estimated to reduce the instantaneous risk by approximately 12.31\% according to the parametric Weibull model and the Cox-model. Recall that in all these estimations it is assumed that the rest of the profile of each individual is the same, except for the described change.
 
 \hypertarget{risk-factors}{%
 \subsection{Risk-factors}\label{risk-factors}}
 
-The covariate \texttt{InvVagAtExam1} (yes) is statistically significant to a level \(\alpha = 0.05\) in both the parametric and semi-parametric model. Moreover, the logrank test of the survival curves yield the conclusion that the levels of the covariate yields different survival curves, which supports the conclusion based on the models. This is estimated to being a risk factor by both models. It is estimated to increasing the instantaneous risk compared a person not experiencing involvement of vagina at exam (with identical profile except for this change) by approximately 48\%, when selecting the slightly more optimistic estimate of the Weibull model instead of the more pessimistic estimate from the Cox model 49\%.
+The covariate \texttt{InvVagAtExam1} (yes) is statistically significant to a level \(\alpha = 0.05\) in both the parametric and semi-parametric model. Moreover, the logrank test of the survival curves yield the conclusion that the levels of the covariate yields different survival curves, which supports the conclusion based on the models. This is estimated to being a risk factor by both models. It is estimated to increasing the instantaneous risk compared a person not experiencing involvement of vagina at exam (with identical profile except for this change) by approximately 48.05\%, when selecting the slightly more optimistic estimate of the Weibull model instead of the more pessimistic estimate from the Cox model 49.47\%.
 
 \end{document}
