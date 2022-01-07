@@ -9,6 +9,9 @@ output:
     toc: false
     number_sections: true
 urlcolor: blue
+header-includes:
+ \usepackage{float}
+ \floatplacement{figure}{H}
 ---
 
 ```{r setup, include=FALSE}
@@ -322,7 +325,7 @@ knitr::kable(cox.shoenfeld.test$table, caption = "Hypothesis Test for Proportion
 The hypothesis test for the proportionality assumption on each of the covariates is applied and the results are shown in table \@ref(tab:schoenfeld-table). As the table shows, all $p$-values are large compared to any reasonable significance level, which means that we do not reject the null hypothesis and we can conclude that the property of proportionality of the covariates is reasonably fulfilled. 
 
 
-```{r graphical-analysis, out.width='32%', fig.show='hold', fig.cap='Graphical analysis for proportional hazards assumption'}
+```{r graphical-analysis, out.width='32%', fig.show='hold', fig.cap='Graphical analysis for proportional hazards assumption', fig.pos='H'}
 par(mar = c(4, 4, .1, .1))
 plot(cox.shoenfeld.test)
 ```

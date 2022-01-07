@@ -1,14 +1,25 @@
 % Options for packages loaded elsewhere
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
-\PassOptionsToPackage{dvipsnames,svgnames*,x11names*}{xcolor}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
 %
 \documentclass[
 ]{article}
+\title{Practical Work}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{Lifetime Data Analysis}
+\author{Rodrigo Arriaza, Alexander J Ohrt}
+\date{07 January, 2022}
+
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
-\usepackage{ifxetex,ifluatex}
-\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+\usepackage{iftex}
+\ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
@@ -40,10 +51,10 @@
   pdftitle={Practical Work},
   pdfauthor={Rodrigo Arriaza, Alexander J Ohrt},
   colorlinks=true,
-  linkcolor=Maroon,
-  filecolor=Maroon,
-  citecolor=Blue,
-  urlcolor=blue,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={blue},
   pdfcreator={LaTeX via pandoc}}
 \urlstyle{same} % disable monospaced font for URLs
 \usepackage[margin=1in]{geometry}
@@ -74,6 +85,7 @@
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{5}
+\usepackage{float}
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
@@ -88,20 +100,9 @@
 \usepackage[normalem]{ulem}
 \usepackage{makecell}
 \usepackage{xcolor}
-\ifluatex
+\ifLuaTeX
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
-
-\title{Practical Work}
-\usepackage{etoolbox}
-\makeatletter
-\providecommand{\subtitle}[1]{% add subtitle to \maketitle
-  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
-}
-\makeatother
-\subtitle{Lifetime Data Analysis}
-\author{Rodrigo Arriaza, Alexander J Ohrt}
-\date{07 januar, 2022}
 
 \begin{document}
 \maketitle
@@ -438,7 +439,7 @@ GLOBAL & 11.8922549 & 9 & 0.2194519\\
 
 The hypothesis test for the proportionality assumption on each of the covariates is applied and the results are shown in table \ref{tab:schoenfeld-table}. As the table shows, all \(p\)-values are large compared to any reasonable significance level, which means that we do not reject the null hypothesis and we can conclude that the property of proportionality of the covariates is reasonably fulfilled.
 
-\begin{figure}
+\begin{figure}[H]
 \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-1} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-2} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-3} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-4} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-5} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-6} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-7} \caption{Graphical analysis for proportional hazards assumption}\label{fig:graphical-analysis}
 \end{figure}
 
