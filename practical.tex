@@ -1,25 +1,14 @@
 % Options for packages loaded elsewhere
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
-\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+\PassOptionsToPackage{dvipsnames,svgnames*,x11names*}{xcolor}
 %
 \documentclass[
 ]{article}
-\title{Practical Work}
-\usepackage{etoolbox}
-\makeatletter
-\providecommand{\subtitle}[1]{% add subtitle to \maketitle
-  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
-}
-\makeatother
-\subtitle{Lifetime Data Analysis}
-\author{Rodrigo Arriaza, Alexander J Ohrt}
-\date{06 January, 2022}
-
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
-\usepackage{iftex}
-\ifPDFTeX
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
@@ -51,10 +40,10 @@
   pdftitle={Practical Work},
   pdfauthor={Rodrigo Arriaza, Alexander J Ohrt},
   colorlinks=true,
-  linkcolor={Maroon},
-  filecolor={Maroon},
-  citecolor={Blue},
-  urlcolor={blue},
+  linkcolor=Maroon,
+  filecolor=Maroon,
+  citecolor=Blue,
+  urlcolor=blue,
   pdfcreator={LaTeX via pandoc}}
 \urlstyle{same} % disable monospaced font for URLs
 \usepackage[margin=1in]{geometry}
@@ -84,7 +73,7 @@
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\setcounter{secnumdepth}{5}
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
@@ -99,9 +88,20 @@
 \usepackage[normalem]{ulem}
 \usepackage{makecell}
 \usepackage{xcolor}
-\ifLuaTeX
+\ifluatex
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
+
+\title{Practical Work}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{Lifetime Data Analysis}
+\author{Rodrigo Arriaza, Alexander J Ohrt}
+\date{07 januar, 2022}
 
 \begin{document}
 \maketitle
@@ -109,7 +109,7 @@
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
 
-We are given a data set on sexually transmitted diseases (STDs). This is data from a study about gonorrhea and chlamydia in 877 women. The objective with this practical work is to study possible risk factors for a reinfection with gonorrhea or chlamydia in women who have suffered one of both infections previously. The variables of interest are sociodemographic variables or those related to sexual practice. We have a lot of variables at our disposal, but have chosen to use the following, some for statistical reasons and some for medical reasons:
+We are given a data set on sexually transmitted diseases (STDs). This is data from a study about gonorrhea and chlamydia in 877 women. The objective with this practical work is to study possible risk factors for a reinfection with gonorrhea or chlamydia in women who have suffered one or both infections previously. The variables of interest are sociodemographic variables or those related to sexual practice. We have a lot of variables at our disposal, but have chosen to use the following, some for statistical reasons and some for medical reasons:
 
 \begin{itemize}
 \tightlist
@@ -133,22 +133,14 @@ The first three were chosen based on results from a \href{https://www.ncbi.nlm.n
 
 Another \href{https://policylab.chop.edu/sites/default/files/pdf/publications/Preventing_Chlamydia_Gonorrhea_Reinfection_through_Increased_Use_of_EPT.pdf}{publication} reports that, on average, 14\% of women with clamydia and 12\% of women with gonorrhea get reinfected, with younger women at higher risk. Moreover, they state that many adolescents treated for infection of one of the two STDs are reinfected within three to six months, usually because of resumed sexual contact with an untreated partner. Thus, the marital status might be interesting to analyse. However, this is not added, because, the ages in the data set are low, which most likely means that the amount in each level of \texttt{MaritalStatus} is very skewed towards ``single''. This can be seen in the descriptive analysis below.
 
-\href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2094865/}{This meta-analysis} reports that the relationship between race, socioeconomic status (SES) and chlamydial infection is not clear. It concludes that SES was not associated with chlamydia infection, where they tested for several variables, where level of parent's education was one of them. Either way, we think it might be interesting to see if the years of schooling of the women (\texttt{YearsSchool}) have any impact on chlamydia reinfection and as is shown below it showed to be statistically significant during the exploratory analysis.
+\href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2094865/}{This meta-analysis} reports that the relationship between race, socioeconomic status (SES) and chlamydial infection is not clear. It concludes that SES was not associated with chlamydia infection, when they tested for several variables, where level of parent's education was one of them. Either way, we think it might be interesting to see if the years of schooling of the women (\texttt{YearsSchool}) have any impact on reinfection. Moreover, as will be shown below, the covariate \texttt{YearsSchool} is statistically significant according to the given model.
 
-Moreover, we chose to use the initial infection (\texttt{InitInfect}) as an explanatory variable, because several of the studies above are only done on one of the two diseases, not on both at the same time. Because of this we wanted to investigate if the initial infection type is a risk factor and, if this is the case, if the risk differs based on which infection was suffered initially.
-
-Naturally, the categorical variable which states if the woman is reinfected or not (\texttt{Reinfection}) will be used as a dependent variable in the analysis and the time until reinfection since the more time a subject is under study, the greater the risk of the event reoccurring.
+We also chose to use the initial infection (\texttt{InitInfect}) as an explanatory variable, because several of the studies above are only done on one of the two diseases, not on both at the same time. Because of this we wanted to investigate if the initial infection type is a risk factor and, if this is the case, if the risk differs based on which infection was suffered initially.
 
 \hypertarget{statistical-variable-selection}{%
 \subsection{Statistical Variable Selection}\label{statistical-variable-selection}}
 
-As noted, in addition to medical criteria for selecting variables, we have used a negative binomial model to discover which variables are statistically significant to the event of reinfection. The negative binomial model can be fitted when the occurence of events is a count for each patient, as described in \href{https://pubmed.ncbi.nlm.nih.gov/22083507/}{this article}. Thereby including all the variables in the model and converting the time into an offset since we are comparing counts for different follow-up times (a person that has been in the study longer would have higher chances of getting reinfected).
-
-\begin{itemize}
-\tightlist
-\item
-  Despite the fact that the age of the woman is found to not be statistically significant in the method above, we have added it because of the mentioned studies (this is thus added based on medical criteria)
-\end{itemize}
+As noted, in addition to medical criteria for selecting variables, we have used a negative binomial model to discover which variables are statistically significant to the event of reinfection. The negative binomial model can be fitted when the occurence of events is a count for each patient, as described in \href{https://pubmed.ncbi.nlm.nih.gov/22083507/}{this article}. Fitting a negative binomial generalized linear model, with the canonical link, with all the variables in the data set and converting the time until reinfection into an offset, yields the parameter estimates and \(p\)-values shown in table \ref{tab:variable-select}. Note that the time until reinfection is converted into an offset because we are comparing counts for different follow-up times (a person that has been in the study longer would have higher chances of getting reinfected).
 
 \begin{table}
 
@@ -211,12 +203,18 @@ AbnormNodeExam1 & 0.0801562 & 0.8764938\\
 \end{tabular}
 \end{table}
 
-Finally, the vaginal involvement at exam (\texttt{InvVagAtExam}) and the discharge at exam (\texttt{DischargeExam}) are selected as variables in our analysis, since they are shown as statistically significant in Table \ref{tab:variable-select}.
+This model explains why the vaginal involvement at exam (\texttt{InvVagAtExam}) and the discharge at exam (\texttt{DischargeExam}) are selected as variables in our analysis, since they are shown as statistically significant in Table \ref{tab:variable-select}.
 
 \hypertarget{descriptive-analysis}{%
 \section{Descriptive Analysis}\label{descriptive-analysis}}
 
-In total, the data set contains 24 variables, but, as noted, we have selected only 7 of them in our analysis. Recall that the data set has 877 women. The percentage of right-censored data in the data set is 60.4, which is a relatively large part of the data set. The women where followed for 1529 days, then the study was stopped.
+In total, the data set contains 24 variables, but, as noted, we have selected only 7 of them in our analysis. Recall that the data set has 877 women. The percentage of right-censored data in the data set is 60.4, which is a relatively large part of the data set. The women where followed for 1529 days, then the study was stopped. For women that were initially infected with only gonorrhea, 8.32\% were reinfected, while for women that were initially infected with only chlamydia, 15.39\% were reinfected. Finally, for women that were initially infected with both diseases, 15.85\% were reinfected.
+
+\begin{figure}
+\centering
+\includegraphics{practical_files/figure-latex/EDA-plots-1.pdf}
+\caption{\label{fig:EDA-plots}Distributions of variables in the data set}
+\end{figure}
 
 The three continuous variables we have chosen to use in the analysis are \texttt{Age}, \texttt{YearsSchool} and \texttt{NumPartners}. The correlations between these variables are not significant except between \texttt{Age} and \texttt{YearsSchool} with the value of 0.43. This could be interesting to have in mind in the following.
 
@@ -226,7 +224,7 @@ The three continuous variables we have chosen to use in the analysis are \texttt
 \hypertarget{survival-curve-estimation}{%
 \subsection{Survival Curve Estimation}\label{survival-curve-estimation}}
 
-The survival curve is estimated by means of Kaplan-Meier and plotted below. The curve below shows the general survival in the data set.
+The survival curve is estimated by means of Kaplan-Meier and plotted in figure \ref{fig:survivalf}. The curve shows the general survival in the data set.
 
 \begin{figure}
 \centering
@@ -239,7 +237,7 @@ The median survival time is estimated to be 705 days.
 \hypertarget{comparison-of-survival-curves}{%
 \subsection{Comparison of Survival Curves}\label{comparison-of-survival-curves}}
 
-In Table \ref{tab:pvalues}, survival functions are compared by means of the nonparametric logrank test. Note that other types of tests also can be used (Fleming-Harrington family of tests), but we have only used the logrank test in this case. The general \(k\)-sample hypothesis that is tested is
+Survival functions for different levels of the nominal variables are compared by means of the nonparametric logrank test. Note that other types of tests also can be used (Fleming-Harrington family of tests), but we have only used the logrank test in this case. The general \(k\)-sample hypothesis that is tested is
 
 \begin{equation*}
         H_0: S_1(t) = \ldots = S_k(t), \forall t \leq \tau \text{ vs. } H_1: \text{ some } S_i(t) \neq S_l(t), \text{ for some } t \leq \tau,
@@ -267,14 +265,14 @@ After trying to fit Weibull, log-logistic and lognormal log-linear models, we co
 
 \begin{figure}
 
-{\centering \includegraphics[width=0.7\linewidth]{practical_files/figure-latex/weibull-resids-1} 
+{\centering \includegraphics{practical_files/figure-latex/weibull-resids-1} 
 
 }
 
 \caption{Residuals of the Weibull Regression Model}\label{fig:weibull-resids}
 \end{figure}
 
-As seen in Figure \ref{fig:weibull-resids}, the standard Gumbel distribution seems to fit relatively nicely to the Kaplan-Meier estimate of the residuals, i.e.~it seems like a reasonable choice for the error term \(W\), which indicates that the Weibull is a reasonable model.
+As seen in figure \ref{fig:weibull-resids}, the standard Gumbel distribution seems to fit relatively nicely to the Kaplan-Meier estimate of the residuals, i.e.~it seems like a reasonable choice for the error term \(W\), which indicates that the Weibull is a reasonable model.
 
 \begin{figure}
 \centering
@@ -282,7 +280,7 @@ As seen in Figure \ref{fig:weibull-resids}, the standard Gumbel distribution see
 \caption{\label{fig:cumhaz-plot}Cumulative hazard plots comparison}
 \end{figure}
 
-The probability plots in Figure \ref{fig:cumhaz-plot} also show that the Weibull is the better parametric model for the data, because the log-logistic and lognormal models clearly do not fit the line in the tails.
+The probability plots in figure \ref{fig:cumhaz-plot} also show that the Weibull is the better parametric model for the data, because the log-logistic and lognormal models clearly do not fit the line in the tails.
 
 \hypertarget{interpretation}{%
 \subsection{Interpretation}\label{interpretation}}
@@ -305,64 +303,63 @@ are the estimated parameters and
 \mathbf{Z}^T = (Age, NumPartn., Cond., YSchool, InitInf., InvVagAtExam., DischargeAtExam), 
 \]
 
-is the vector of values. Thus, each of the quantities \(\exp(\gamma_i)\) can be interpreted as the unitary change in time until reinfection (when covariate \(i\) is continuous), or the change in time until reinfection when changing level (when the covariate \(i\) is categorical with different levels), when all the other explanatory variables are kept fixed. This means that a positive parameter estimate \(\hat{\gamma}_i\) gives \(\exp(\gamma_i) > 0\), which means that the covariate is estimated to being protective by the model, since it increases \(\ln(T)\). The opposite holds for \(\hat{\gamma}_i < 0\). These interpretations will be done with the acceleration factor and relative hazard next.
+is the vector of values. Thus, each of the quantities \(\exp(\gamma_i)\) can be interpreted as the unitary change in time until reinfection (when covariate \(i\) is continuous), or the change in time until reinfection when changing level (when the covariate \(i\) is nominal), when all the other explanatory variables are kept fixed. This means that a positive parameter estimate \(\hat{\gamma}_i\) gives \(\exp(\gamma_i) > 0\), which means that the covariate is estimated to being protective by the model, since it increases \(\ln(T)\). The opposite holds for \(\hat{\gamma}_i < 0\). These interpretations will be done with the acceleration factor and relative hazard next.
 
 In the Weibull model, the acceleration factor (AF) is calculated using the equation
 
 \[
-AF = \exp(-\hat{\gamma}_i)
+AF = \exp(-\hat{\gamma}_i),
 \]
 and the hazard ratio (HR) is calculated using the equation
 
 \[
 HR = \exp(-\hat{\gamma}_i/\hat{\sigma}).
 \]
-In this case, the model fit gives the scale \(\hat{\sigma} \approx\) 1.298. These values are calculated for each of the covariates below.
+In this case, the model fit gives the scale \(\hat{\sigma} \approx\) 1.298. These values are calculated for each of the covariates and displayed in table \ref{tab:Weibull-table}.
 
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-1}Parameter Estimates, AF and HR for each Parameter Estimate}
+\caption{\label{tab:Weibull-table}Parameter estimates, p-values, AF and HR for each parameter estimate}
 \centering
-\begin{tabular}[t]{l|r|r|r}
+\begin{tabular}[t]{l|r|r|r|r}
 \hline
-  & Parameter.Estimate & AF & HR\\
+  & Parameter.Estimate & p & AF & HR\\
 \hline
-(Intercept) & 3.9516047 & 0.0192238 & 0.0475893\\
+(Intercept) & 3.9516047 & 0.0000000 & 0.0192238 & 0.0475893\\
 \hline
-Age & 0.0101018 & 0.9899491 & 0.9922457\\
+Age & 0.0101018 & 0.5291236 & 0.9899491 & 0.9922457\\
 \hline
-NumPartners & -0.0138832 & 1.0139800 & 1.0107560\\
+NumPartners & -0.0138832 & 0.8383511 & 1.0139800 & 1.0107560\\
 \hline
-CondomUse2 & 0.0788112 & 0.9242144 & 0.9410747\\
+CondomUse2 & 0.0788112 & 0.7924374 & 0.9242144 & 0.9410747\\
 \hline
-CondomUse3 & 0.4227912 & 0.6552154 & 0.7219443\\
+CondomUse3 & 0.4227912 & 0.1734952 & 0.6552154 & 0.7219443\\
 \hline
-YearsSchool & 0.1704370 & 0.8432962 & 0.8769191\\
+YearsSchool & 0.1704370 & 0.0004676 & 0.8432962 & 0.8769191\\
 \hline
-InitInfect2 & 0.5109972 & 0.5998971 & 0.6745026\\
+InitInfect2 & 0.5109972 & 0.0073776 & 0.5998971 & 0.6745026\\
 \hline
-InitInfect3 & 0.3149121 & 0.7298530 & 0.7845268\\
+InitInfect3 & 0.3149121 & 0.1001146 & 0.7298530 & 0.7845268\\
 \hline
-InvVagAtExam1 & -0.5091714 & 1.6639119 & 1.4804896\\
+InvVagAtExam1 & -0.5091714 & 0.0213272 & 1.6639119 & 1.4804896\\
 \hline
-DischargeExam1 & 0.4601294 & 0.6312020 & 0.7014676\\
+DischargeExam1 & 0.4601294 & 0.1118362 & 0.6312020 & 0.7014676\\
 \hline
 \end{tabular}
 \end{table}
 
-Consider an example using the covariate \texttt{CondomUse} when explaining the interpretation of the covariates in terms of the AF. From the table above it is apparent that the AF of \texttt{CondomUse3} versus \texttt{CondomUse1} is \(\approx\) 0.655. This means that the reinfection time for a person that never uses a condom is \(\approx\) 0.655 times the reinfection time for a person that always uses a condom. However as we've seen in \ref{tab:variable-select}, the use of a condom was not statistically significant for this study, so it is uncertain to make conclusions such as this.
-The interpretation in terms of the AF is similar when considering the other covariates, except for when considering the \texttt{Age} and \texttt{NumPartners}, which is not categorical.
+Consider an example using the covariate \texttt{CondomUse} when explaining the interpretation of the covariates in terms of the AF. From the table it is apparent that the AF of \texttt{CondomUse3} versus \texttt{CondomUse1} is \(\approx\) 0.655. This means that the reinfection time for a person that never uses a condom is \(\approx\) 0.655 times the reinfection time for a person that always uses a condom. However as we have seen in table \ref{tab:variable-select}, the use of a condom was not statistically significant for this study, so it is uncertain to make conclusions such as this. More importantly, the fitted Weibull model gives large \(p\)-values for the levels of \texttt{CondomUse}, which leads to the same conclusion; that according to these statistical models, evidence of different risk of reinfection for the use of condoms does not exist. The interpretation in terms of the AF is similar when considering the other covariates, except for when considering the \texttt{Age} and \texttt{NumPartners}, which are not categorical. In these cases we talk about a similar change in the survival, i.e.~the reinfection time, for unitary changes in the covariates, when the rest of the profile is kept constant.
 
 Similarly, an example can be used to explain the interpretation of the covariates in terms of the relative hazard. From the table it is apparent that the hazard of \texttt{CondomUse3} relative to \texttt{CondomUse1} is \(\approx\) 0.722. This means that the instantaneous risk of reinfection for a person that never uses a condom is \(\approx\) 0.722 times the instantaneous risk of a person that always uses a condom. Similar interpretations can be done with the other covariates.
 
 \hypertarget{fit-of-a-semi-parametric-survival-model}{%
 \section{Fit of a semi-parametric survival model}\label{fit-of-a-semi-parametric-survival-model}}
 
-The proportional hazards model's fit is shown in Table \ref{tab:Cox-model}.
+The fit of the proportional hazards model is shown in table \ref{tab:Cox-model}.
 
 \begin{table}
 
-\caption{\label{tab:Cox-model}Cox model coeffiecients}
+\caption{\label{tab:Cox-model}Cox model coefficients}
 \centering
 \begin{tabular}[t]{l|r|r|r|r|r}
 \hline
@@ -400,17 +397,17 @@ How do we interpret this model fit? First of all, the model we have fit follows 
 
 where \(\beta\) are the parameters in the model and \(\mathbf{Z}\) is the profile of the woman. Additionally, \(\lambda_0(t)\) is the hazard at time \(t\) for a woman with profile \(\mathbf{Z} = 0\), i.e.~a woman that always uses a condom, that was initially infected with (only) gonorrhea, that did not experience vaginal involvement at exam and did not experience discharge at exam. The model assumes that the hazard ratio is proportionally equal to \(\exp(\mathbf{\beta}^T\mathbf{Z})\) at all times. Said in other words, it relates the instantaneous risk for a woman with profile \(\mathbf{Z}\) at time \(t\) with the instantaneous risk for a woman with the baseline profile at the same time \(t\).
 
-The model parameters \(\beta\) can be interpreted in terms of relative hazards. As is seen from the formula above, the hazard ratio between a woman with profile \(\mathbf{Z}\) and a woman with profile \(\mathbf{Z} = \mathbf{0}\) is \(\exp(\mathbf{\beta}^T\), where the values are given in the second column of the table above. The interpretation in terms of relative hazards in this case is the same as the interpretation of the Weibull survival model fit earlier, since the Weibull regression model allows a representation of the proportional hazards model. This is done by setting \(\beta = -\gamma/\sigma\). Note that, because of this, the values for \texttt{exp(coef)} in the table above and the \texttt{HR}-values for the Weibull model calculated earlier are very similar, as they should. They are not exactly the same for numerical reasons when fitting the models.
+The model parameters \(\beta\) can be interpreted in terms of relative hazards. As is seen from the formula above, the hazard ratio between a woman with profile \(\mathbf{Z}\) and a woman with profile \(\mathbf{Z} = \mathbf{0}\) is \(\exp(\mathbf{\beta}^T)\), where the values are given in the second column of table \ref{tab:Cox-model}. The interpretation in terms of relative hazards in this case is the same as the interpretation in terms of relative hazards in the Weibull survival model fit from earlier, since the Weibull regression model allows a representation of the proportional hazards model. This is done by setting \(\beta = -\gamma/\sigma\). Note that, because of this, the values for \texttt{exp(coef)} in the table above and the \texttt{HR}-values for the Weibull model calculated earlier are very similar, as they should. They are not exactly the same for numerical reasons when fitting the models.
 
 \hypertarget{analysis-of-residuals}{%
 \subsection{Analysis of Residuals}\label{analysis-of-residuals}}
 
-In this section we will check the Cox-model's goodness-of-fit. The concordance of the model is 0.6024116 and all three statistical tests give a p-value \textless{} 0.05, by which it can already be argued that the model fits the data well. However, we will also check other assumptions on the residuals.
+In this section we will check the goodness-of-fit of the Cox-model. The concordance of the model is 0.6024116 and all three statistical tests (Likelihood test, Wald test and Score test) give a \(p\)-value \textless{} 0.05, by which it can already be argued that the model fits the data well. However, we will also check other assumptions on the residuals.
 
 \hypertarget{proportional-hazards-assumption}{%
 \subsubsection{Proportional Hazards Assumption}\label{proportional-hazards-assumption}}
 
-First of all, the Shoenfeld residuals can be used to check the proportional hazards assumption. The residuals are plotted in \ref{fig:graphical-analysis}. The lines in the plots look relatively straight, which indicates that the proportionality assumption might hold.
+First of all, the Shoenfeld residuals can be used to check the proportional hazards assumption. The residuals are plotted in figure \ref{fig:graphical-analysis}. The lines in the plots look relatively straight, which indicates that the proportionality assumption might hold.
 
 \begin{table}
 
@@ -439,20 +436,16 @@ GLOBAL & 11.8922549 & 9 & 0.2194519\\
 \end{tabular}
 \end{table}
 
-The hypothesis test for the proportionality assumption on each of the covariates is applied above. As the table shows, all \(p\)-values are large compared to any reasonable significance level, which means that we do not reject the null hypothesis and we can conclude that the property of proportionality of the covariates is reasonably fulfilled.
+The hypothesis test for the proportionality assumption on each of the covariates is applied and the results are shown in table \ref{tab:schoenfeld-table}. As the table shows, all \(p\)-values are large compared to any reasonable significance level, which means that we do not reject the null hypothesis and we can conclude that the property of proportionality of the covariates is reasonably fulfilled.
 
 \begin{figure}
 \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-1} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-2} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-3} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-4} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-5} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-6} \includegraphics[width=0.32\linewidth]{practical_files/figure-latex/graphical-analysis-7} \caption{Graphical analysis for proportional hazards assumption}\label{fig:graphical-analysis}
 \end{figure}
 
-In the plots above it is noticeable that they all show a horizontal line which confirms the numerical analysis from \ref{tab:schoenfeld-table}.
-
 \hypertarget{influential-observations-in-the-global-fit}{%
 \subsubsection{Influential Observations in the Global Fit}\label{influential-observations-in-the-global-fit}}
 
-Secondly, we can check if there are any influential observations using residuals based on the score residuals. A transformation of the score residuals for each of the four coefficients is plotted below. More precisely, each residual that is plotted is the approximate change in the coefficient vector if the observation in question is dropped, scaled by the standard error of the coefficients.
-
-From the plots above, it becomes apparent that there clearly are some influential observations for each of the covariates.
+Secondly, we can check if there are any influential observations using residuals based on the score residuals. By plotting a transformation of the score residuals for each of the four coefficients, influential observations can be visually located. More precisely, each plotted residual would be the approximate change in the coefficient vector if the observation in question is dropped, scaled by the standard error of the coefficients. These plots are omitted, but the influential observations that were found are displayed in the output below.
 
 \begin{verbatim}
 #>     Age NumPartners CondomUse YearsSchool InitInfect InvVagAtExam DischargeExam
@@ -491,12 +484,12 @@ Thirdly, the the linear assumption of the continuous variables \texttt{Age}, \te
 \caption{\label{fig:linearcovs}Linear covariates graphical analysis}
 \end{figure}
 
-As can be seen in Figure \ref{fig:linearcovs}, the linear assumption of age seems to hold just fine, while the linear assumption for the two other continuous covariates is more uncertain if holds based on the smoother, which is not flat at all.
+As can be seen in figure \ref{fig:linearcovs}, the linear assumption of age seems to hold just fine, while the linear assumption for the two other continuous covariates is more uncertain if holds based on the smoother, which is not flat at all.
 
 \hypertarget{conclusions}{%
 \section{Conclusions}\label{conclusions}}
 
-Assuming that the parametric and semi-parametric models can be trusted, the data analysis has uncovered some possible protective factors and risk-factors for reinfection with gonorrhea or chlamydia in women who had suffered one of both infections previously.
+Assuming that the parametric and semi-parametric models can be trusted, the data analysis has uncovered some possible protective factors and risk-factors for reinfection with gonorrhea or chlamydia in women who had suffered one or both infections previously.
 
 \hypertarget{protective-factors}{%
 \subsection{Protective Factors}\label{protective-factors}}
@@ -507,7 +500,5 @@ The covariates \texttt{YearsSchool} and \texttt{InitInfect2} (Initial infection 
 \subsection{Risk-factors}\label{risk-factors}}
 
 The covariate \texttt{InvVagAtExam1} (yes) is statistically significant to a level \(\alpha = 0.05\) in both the parametric and semi-parametric model. Moreover, the logrank test of the survival curves yield the conclusion that the levels of the covariate yields different survival curves, which supports the conclusion based on the models. This is estimated to being a risk factor by both models. It is estimated to increasing the instantaneous risk compared a person not experiencing involvement of vagina at exam (with identical profile except for this change) by approximately 48\%, when selecting the slightly more optimistic estimate of the Weibull model instead of the more pessimistic estimate from the Cox model 49\%.
-
-\textbf{Perhaps do some predictions of new data (as shown in lab 7 I think), to further quantify the conclusions? We don't have to, but could.}
 
 \end{document}
